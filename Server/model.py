@@ -16,40 +16,164 @@ import os
 from google.appengine.ext import ndb
 
 class User(ndb.Model):
-    key_name = ndb.StringProperty(indexed=True)
+    """Models an individual Quora+ User"""
+    email = ndb.StringProperty(indexed=True)
     password = ndb.StringProperty(indexed=False)
-    date_created = ndb.DateProperty(indexed=False)
+    date_created = ndb.DateTimeProperty(indexed=False, auto_now=True)
     first_name = ndb.StringProperty(indexed=False)
     last_name = ndb.StringProperty(indexed=False)
 
-class Question(User):
-    date_created = ndb.DateProperty(indexed=False)
-    description = ndb.TextProperty(auto_now_add=False)
+    @classmethod 
+    @ndb.transactional(retries=1)
+    def create_user(cls, email, password, first_name, last_name):
+        key = ndb.Key(User, email)
+        if key.get() is None:
+            user = User(key=key,
+                        email=email,
+                        password=password,
+                        first_name=first_name,
+                        last_name=last_name)
+            user.put()
+            return True
+        return False
 
-class Notification(User):
-    date_created = ndb.DateProperty(indexed=False)
-    description = ndb.StringProperty(indexed=False)
+
+class Question(ndb.Model):
+    """Models an individual Question on  Quora+"""
+    date_created = ndb.DateProperty(indexed=True, auto_now=True)
+    description = ndb.TextProperty(indexed=True)
+
+    @classmethod 
+    @ndb.transactional(retries=1)
+    def create_question(cls, email, description):
+        parent = ndb.Key(User, email)
+        qry = Question.query(ndb.AND(Question.parent == parent,
+                                     Question.description == description))
+
+        if len(qry) == 0:
+            question = Question(email=email,
+                                password=password,
+                                first_name=first_name,
+                                last_name=last_name)
+            question.key().parent = parent
+            question.put()
+            return True
+        return False
+
+class Notification(ndb.Model):
+    date_created = ndb.DateProperty(indexed=True)
+    description = ndb.StringProperty(indexed=True)
     is_read = ndb.BooleanProperty(default=False, indexed=True)
+    @classmethod 
+    @ndb.transactional(retries=1)
+    def create_notification(cls, email, description):
+        parent = ndb.Key(User, email)
+        notification = Notification(description=description)
+        notification.put()
+        return True
 
-class Circle(User):
-    date_created = ndb.DateProperty(indexed=False)
+    @classmethod 
+    @ndb.transactional(retries=1)
+    def mark_as_read(cls, email, identifier):
+        key = ndb.Key(User, email, Notification, identifier)
+        notification = key.get()
+        notification.is_read = True
+        notification.put()
+        return True
+
+class Circle(ndb.Model):
+    """Models circle membership on  Quora+"""
+    date_created = ndb.DateProperty(indexed=False, auto_now_add=True)
     description = ndb.StringProperty(indexed=False)
-    name = ndb.StringProperty(indexed=False)
+    name = ndb.StringProperty(indexed=True)
+
+    @classmethod 
+    @ndb.transactional(retries=1)
+    def create_circle(cls, email, name, description):
+        parent = ndb.Key(User, email)
+        key = ndb.Key(Circle, name, parent=parent)
+        if key.get() is None:
+            circle = Circle(key=key,
+                            description=description,
+                            name=name)
+            circle.put()
+            return True
+        return False
 
 class Answer(Question):
+    """Models answer on Quora+"""
     description = ndb.StringProperty(indexed=False)
     date_created = ndb.DateProperty(auto_now_add=True)
     email = ndb.StringProperty(indexed=True)
 
-class Upvote(Answer):
-    email = ndb.StringProperty(indexed=True)
+    @classmethod
+    @ndb.transactional(retries=1)
+    def create_answer(cls, identifier, author_email, description, email):
+        parent = ndb.Key(Question, identifier, User, email)
+        answer = Answer(description=description,
+                        email=author_email
+                        )
+        answer.put()
+        return True
 
-class Favorite(Question):
+class Vote(ndb.Model):
+    """Models upvoting on Quora+"""
     email = ndb.StringProperty(indexed=True)
+    state = ndb.IntegerProperty(indexed=True, default=1)
+    @classmethod
+    @ndb.transactional(retries=1)
+    def create_or_update_vote(cls, answer_id, voter_email, description, email, question_id):
+        parent = ndb.Key(User, email, Question, question_id, Answer, answer_id)
+        key = ndb.Key(Vote, voter_email, parent=parent)
+        if key.get() is None:
+            vote = Vote(key=key, email=voter_email)
+            vote.put()
+        else:
+            vote = key.get()
+            vote.state = 1 - vote.state
+            vote.put()
+        return True
 
-class Share(Question):
-    circle_name = ndb.StringProperty(indexed=False)
+class Favorite(ndb.Model):
+    question_id = ndb.StringProperty(indexed=True)
+    @classmethod
+    @ndb.transactional(retries=1)
+    def create_or_update_favorite(cls, email, question_id):
+        parent = ndb.Key(User, email)
+        key = ndb.Key(Favorite, question_id, parent=parent)
+        if key.get() is None:
+            favorite = Favorite(question_id=question_id)
+            favorite.put()
+        else:
+            favorite = qry[0]
+            favoite.key.delete()
+        return True
+
+class Share():
+    circle_name = ndb.StringProperty(indexed=True)
+    date_created = ndb.DateTimeProperty(indexed=False, auto_now=True)
+    @classmethod
+    @ndb.transactional(retries=1)
+    def create_share(cls, circle_name, email, question_id):
+        parent = ndb.Key(User, email, Question, question_id)
+        key = ndb.Key(Share, circle_name, parent=parent)
+        if key.get() is None:
+            share = Share(key=key, circle_name=circle_name)
+            share.put()
+            return True
+        return False
 
 class Contact(User):
     email = ndb.StringProperty(indexed=True)
+    date_created = ndb.DateTimeProperty(indexed=True, auto_now=True)
     circle_names = ndb.StringProperty(repeated=True, indexed=False)
+    @classmethod
+    @ndb.transactional(retries=1)
+    def create_share(cls, circle_name, email, question_id):
+        parent = ndb.Key(User, email, Question, question_id)
+        key = ndb.Key(Share, circle_name, parent=parent)
+        if key.get() is None:
+            share = Share(parent=parent, key=key, circle_name=circle_name)
+            share.put()
+            return True
+        return False
