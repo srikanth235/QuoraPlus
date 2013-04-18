@@ -34,8 +34,8 @@ class User(ndb.Model):
                         first_name=first_name,
                         last_name=last_name)
             user.put()
-            return True
-        return False
+            return user
+        return None
 
 
 class Question(ndb.Model):
@@ -61,6 +61,7 @@ class Question(ndb.Model):
         return False
 
 class Notification(ndb.Model):
+    """Models user notification on  Quora+"""
     date_created = ndb.DateProperty(indexed=True)
     description = ndb.StringProperty(indexed=True)
     is_read = ndb.BooleanProperty(default=False, indexed=True)
@@ -108,8 +109,8 @@ class Answer(Question):
 
     @classmethod
     @ndb.transactional(retries=1)
-    def create_answer(cls, identifier, author_email, description, email):
-        parent = ndb.Key(Question, identifier, User, email)
+    def create_answer(cls, question_id, author_email, description, email):
+        parent = ndb.Key(Question, question_id, User, email)
         answer = Answer(description=description,
                         email=author_email
                         )
@@ -122,7 +123,7 @@ class Vote(ndb.Model):
     state = ndb.IntegerProperty(indexed=True, default=1)
     @classmethod
     @ndb.transactional(retries=1)
-    def create_or_update_vote(cls, answer_id, voter_email, description, email, question_id):
+    def create_or_update_vote(cls, answer_id, voter_email, email, question_id):
         parent = ndb.Key(User, email, Question, question_id, Answer, answer_id)
         key = ndb.Key(Vote, voter_email, parent=parent)
         if key.get() is None:
@@ -135,6 +136,7 @@ class Vote(ndb.Model):
         return True
 
 class Favorite(ndb.Model):
+    """Models favorite on Quora+"""
     question_id = ndb.StringProperty(indexed=True)
     @classmethod
     @ndb.transactional(retries=1)
@@ -150,6 +152,7 @@ class Favorite(ndb.Model):
         return True
 
 class Share():
+    """Models sharing to circles on Quora+"""
     circle_name = ndb.StringProperty(indexed=True)
     date_created = ndb.DateTimeProperty(indexed=False, auto_now=True)
     @classmethod
@@ -164,16 +167,17 @@ class Share():
         return False
 
 class Contact(User):
+    """Models individual contacts on Quora+"""
     email = ndb.StringProperty(indexed=True)
     date_created = ndb.DateTimeProperty(indexed=True, auto_now=True)
     circle_names = ndb.StringProperty(repeated=True, indexed=False)
     @classmethod
     @ndb.transactional(retries=1)
-    def create_share(cls, circle_name, email, question_id):
-        parent = ndb.Key(User, email, Question, question_id)
-        key = ndb.Key(Share, circle_name, parent=parent)
+    def create_contact(cls, circle_names, contact_email, email):
+        parent = ndb.Key(User, email)
+        key = ndb.Key(Contact, contact_email, parent=parent)
         if key.get() is None:
-            share = Share(parent=parent, key=key, circle_name=circle_name)
-            share.put()
+            contact = Contact(key=key, email=contact_email, cicle_names=circle_names)
+            contact.put()
             return True
         return False
