@@ -6,8 +6,8 @@
 <meta name="keywords" content="">
 <title>Create Circle</title>
 <link rel="stylesheet" type="text/css" href="sourcecss.css">
- <script type="text/javascript" src="jquery.js"></script>
- <script>
+<script type="text/javascript" src="jquery.js"></script>
+<script>
 function createCircle() {
    name = $("#name").val();
   // email = $("#email").val();
@@ -24,33 +24,26 @@ function createCircle() {
 </script>
 </head>
 <body>
-	<hr/>
+	<hr />
 	<div class="titlebar">
 		<input type="button" id="home" value="Quora+">
 	</div>
 	<hr />
 	<form name="myCircle" onsubmit="return validateForm()" method="post">
-	<table class = center>
-		<tr>
-			<td>
-				Circle Name:
-			</td>
-			<td>
-				<input type="text" id="name">
-			</td>
-		</tr>
-		<tr>
-			<td>
-				Circle Description:
-			</td>
-			<td>
-				<textarea rows="4" cols="20" id="description"></textarea>
-			</td>
-		</tr>
-	</table>
-	<div id="create_circle">
-			<input type="submit" id="create_button" onclick = createCircle() value="Create Circle">
-	</div>
+		<table class=center>
+			<tr>
+				<td>Circle Name:</td>
+				<td><input type="text" id="name"></td>
+			</tr>
+			<tr>
+				<td>Circle Description:</td>
+				<td><textarea rows="4" cols="20" id="description"></textarea></td>
+			</tr>
+		</table>
+		<div id="create_circle">
+			<input type="submit" id="create_button" onclick=createCircle()
+				value="Create Circle">
+		</div>
 	</form>
 </body>
 </html>

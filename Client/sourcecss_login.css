@@ -1,66 +1,76 @@
-       * {
-              margin: 0px;
-              padding: 0px;
-			  outline: none;
-       }
-       form {
-              border: 1px solid black;
-              width: 250px;
-              margin:50px auto;
-              padding: 20px;
-       }
-       label {
-              font-size: 12px;
-              font-family: arial, sans-serif;
-              list-style-type: none;
-              color: #fff;
-              text-shadow: #000 1px 1px;
-              margin-bottom: 10px;
-              font-weight: bold;
-              letter-spacing: 1px;
-              text-transform: uppercase;
-              display: block;
-       }
-       input {
-              padding: 6px;
-              border-bottom: 0px;
-              border-left: 0px;
-              border-right: 0px;
-              margin-bottom: 10px;
-              width: 230px;
-       }
-	   input.submit {
-              width: 100px;
-              color: #fff;
-              text-transform: uppercase;
-              border-top: 1px solid #ad64e0;
-              margin-top: 10px;
-       }
-     	#header{
-			margin-bottom: 0px;
-			background-color: #FF3333;
-		}
-		#content {
-			 color: #fff;
-			 font-size: 0;
-			 width: 100px;
-			 height: 30px;
-		}
-		#Circles{
-			position: absolute;
-			right:0px;
-			width:30px;
-		}
-		#favorite_image{
-			height: 25px;
-			width:25px;
-			float:left;
-		}
-		#question_content{
-			float: right;
-		}
-		#vote_count{
-			float:left;
-			height:25px;
-			width:25px;
-		}
+* {
+	margin: 0px;
+	padding: 0px;
+	outline: none;
+}
+
+form {
+	border: 1px solid black;
+	width: 250px;
+	margin: 50px auto;
+	padding: 20px;
+}
+
+label {
+	font-size: 12px;
+	font-family: arial, sans-serif;
+	list-style-type: none;
+	color: #fff;
+	text-shadow: #000 1px 1px;
+	margin-bottom: 10px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	display: block;
+}
+
+input {
+	padding: 6px;
+	border-bottom: 0px;
+	border-left: 0px;
+	border-right: 0px;
+	margin-bottom: 10px;
+	width: 230px;
+}
+
+input.submit {
+	width: 100px;
+	color: #fff;
+	text-transform: uppercase;
+	border-top: 1px solid #ad64e0;
+	margin-top: 10px;
+}
+
+#header {
+	margin-bottom: 0px;
+	background-color: #FF3333;
+}
+
+#content {
+	color: #fff;
+	font-size: 0;
+	width: 100px;
+	height: 30px;
+}
+
+#Circles {
+	position: absolute;
+	right: 0px;
+	width: 30px;
+}
+
+#favorite_image {
+	height: 25px;
+	width: 25px;
+	float: left;
+}
+
+#question_content {
+	float: right;
+}
+
+#vote_count {
+	float: left;
+	height: 25px;
+	width: 25px;
+}

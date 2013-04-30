@@ -6,20 +6,21 @@
 <meta name="keywords" content="">
 <title>Create Contact</title>
 <link rel="stylesheet" type="text/css" href="sourcecss.css">
- <script type="text/javascript" src="jquery.js"></script>
- <script>
- function createContact() {
-	   name = $("#name").val();
-	   email = $("#email").val();
-	   circles = $("#circles").val();
-	   $.post("/create_contact",
-	          {"name": name, "circles": circles, "email": email})
-	   .done(function(data) {
-	        window.location.href = "/ViewContacts.html";//???
-	   })
-	   .fail(function() {
-	        $("body").html("Try Again!");
-	   })
+<script type="text/javascript" src="jquery.js"></script>
+<script>
+	function createContact() {
+		name = $("#name").val();
+		email = $("#email").val();
+		circles = $("#circles").val();
+		$.post("/create_contact", {
+			"name" : name,
+			"circles" : circles,
+			"email" : email
+		}).done(function(data) {
+			window.location.href = "/ViewContacts.html";//???
+		}).fail(function() {
+			$("body").html("Try Again!");
+		})
 	}
 </script>
 </head>
@@ -50,7 +51,8 @@
 			</tr>
 		</table>
 		<div id="create_circle">
-			<input type="submit" id="create_button" onclick = createContact() value="Create Contact">
+			<input type="submit" id="create_button" onclick=createContact()
+				value="Create Contact">
 		</div>
 	</form>
 </body>

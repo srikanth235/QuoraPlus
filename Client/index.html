@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="description" content="">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="keywords" content="">
 <title>Main Page</title>
 <link rel="stylesheet" type="text/css" href="sourcecss.css">
@@ -11,12 +12,11 @@
 <script>
  function vote() {
    name = $("#name").val();
-  // email = $("#email").val();???how to get email
-   state = $("#").val();///????
+   state = $("#").val();
    $.post("/vote",
-          {"name"= name,"email"= email, "description" = description})///??how to get email id
+          {"name"= name,"email"= email, "description" = description})
    .done(function(data) {
-        window.location.href = "/main_page";///????
+        window.location.href = "/main_page";
    })
    .fail(function() {
         $("body").html("Try Again!");
@@ -24,12 +24,11 @@
 }
  function favorite() {
 	   name = $("#name").val();
-	  // email = $("#email").val();
 	   description = $("#description").val();
 	   $.post("/vote",
-	          {"name"= name,"email"= email, "description" = description})///??how to get email id
+	          {"name"= name,"email"= email, "description" = description})
 	   .done(function(data) {
-	        window.location.href = "/main_page";///????
+	        window.location.href = "/main_page";
 	   })
 	   .fail(function() {
 	        $("body").html("Try Again!");
@@ -44,10 +43,10 @@
 	</div>
 	<hr />
 	<div class="menubar">
-		<input type="button" id="add_question" value="Add Question" /> 
-		<input type="button" id="notifications" value="Notifications" /> 
-		<input type="button" id="content" value="More" /> 
-		    <select name="circle_select">
+		<input type="button" id="add_question" value="Add Question" /> <input
+			type="button" id="notifications" value="Notifications" /> <input
+			type="button" id="content" value="More" /> <select
+			name="circle_select">
 			<option value="All Circles">All Circles</option>
 			<option value="Family">Family</option>
 			<option value="Friends">Friends</option>
@@ -56,14 +55,15 @@
 	<hr />
 	<table id="content_main_table">
 		<tr>
-		<div id="toggler1">
-			<td><img src="favorite_blank.jpg" id="favorite_image"></img>
-			<img src="favorite_voted.jpg" width="360px" height="150px" style="display:none"/></td>
-		<div id="toggler1">
-			<div class="questions">
-				<div id="question_content">
-					<td><strong>Web Programming: What is the most
-							non-boring way to learn web programming? <br /></td>
+			<div id="toggler1">
+				<td><img src="favorite_blank.jpg" id="favorite_image"></img> <img
+					src="favorite_voted.jpg" width="360px" height="150px"
+					style="display: none" /></td>
+				<div id="toggler1">
+					<div class="questions">
+						<div id="question_content">
+							<td><strong>Web Programming: What is the most
+									non-boring way to learn web programming? <br /></td>
 		</tr>
 		<tr>
 			<td><input type="button" id="vote_count" value="1"></td>
@@ -77,10 +77,8 @@
 			</td>
 		</tr>
 		<tr>
-			<td/>
-			<td>
-				<a href = "#">Upvote</a>
-				<a href = "#">Downvote</a> <!-- how to give on click function -->
+			<td />
+			<td><a href="#">Upvote</a> <a href="#">Downvote</a> <!-- how to give on click function -->
 			</td>
 		</tr>
 		</div>
