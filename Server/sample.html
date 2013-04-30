@@ -1,0 +1,14 @@
+<html>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"> </script>
+<script src="https://raw.github.com/linkedin/dustjs/master/dist/dust-full-1.2.0.js"></script>
+<script src="http://localhost:8080/html/example.js"> </script>
+<body>
+here
+</body>
+<script>
+dust.render('example.tl', {firstName:'James', lastName:'Smith'}, function(err, out) {
+                   alert(err);
+                   $("body").html(out);
+})
+</script>
+</html>
