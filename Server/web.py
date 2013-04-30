@@ -44,7 +44,7 @@ class CreateUser(webapp2.RequestHandler):
                             first_name=self.request.get("first_name"),
                             last_name=self.request.get("last_name"))
           if result:
-              self.redirect("/login")
+              self.response.out.write("Success")
           else:
               self.response.out.write("Failure")
 
@@ -146,9 +146,9 @@ class Login(webapp2.RequestHandler):
     def post(self):
         if User.is_valid_user(self.request.get("email"),
                               self.request.get("password")):
-            self.redirect("/html/index.html")
+            self.response.out.write("Success")
         else:
-            self.response.out.write("/html/login.html")
+            self.response.out.write("Failure")
 
 class MainPage(webapp2.RequestHandler):
     def post(self):

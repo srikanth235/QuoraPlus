@@ -39,7 +39,7 @@ class User(ndb.Model):
         return None, False
 
     @classmethod
-    def is_valid_user(cls, self, email, password):
+    def is_valid_user(cls, email, password):
         key     = ndb.Key(User, email)
         user = key.get()
         if user is None:
