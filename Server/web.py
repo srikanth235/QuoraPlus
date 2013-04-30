@@ -118,7 +118,7 @@ class CreateContact(webapp2.RequestHandler):
             self.response.out.write("Failure")
             
 class MarkVote(webapp2.RequestHandler):
-    def post(self):
+    def get(self):
         answer_id = int(self.request.get("answer_id"))
         state = int(self.request.get("state"))
         vote, result = Vote.create_or_update_vote(

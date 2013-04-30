@@ -11,7 +11,7 @@
 <script type="text/javascript" src="stylesheets/jquery.js"></script>
 <script>
 	function createUser() {
-		validate();
+		//validate();
 		first_name = $("#first_name").val();
 		email = $("#email").val();
 		last_name = $("#last_name").val();
@@ -26,6 +26,9 @@
 			if (data === "Success")
 				window.location.href = "/html/login.html";
 		})
+		.fail(function(data) {
+		    alert("Fail")
+		});
 	}
 	function validate() {
 		if (document.create_user_form.first_name.value == "") {
@@ -57,7 +60,7 @@
 			alert("Password Mismatch!");
 			return false;
 		}
-		return (true);
+		return true;
 	}
 </script>
 </head>
@@ -68,7 +71,6 @@
 		<hr />
 	</div>
 	<div class="body_content">
-		<form name="create_user_form" method="post">
 			<table class=center>
 				<tr>
 					<td>First Name:</td>
@@ -96,7 +98,6 @@
 				<input type="submit" id="create_button" onclick=createUser()
 					value="Create User">
 			</div>
-		</form>
 		<div>
 </body>
 </html>

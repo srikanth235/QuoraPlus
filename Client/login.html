@@ -11,6 +11,22 @@
 <script type="text/javascript" src="stylesheets/jquery.js"></script>
 <script src="stylesheets/javasource.js"></script>
 <script>
+   function doLogin() {
+       email = $("#email").val();
+       password= $("#password").val();
+       $.post("/login",
+             {"email": email, "password": password})
+       .done(function(data) {
+          if(data === "Success") {
+            localStorage['email'] = email;
+            localStorage['name'] = email
+            window.location.href="/main";
+          }
+          else
+            alert("Failure")
+        })
+    }
+	
 	function validate() {
 		if (document.frmLogin.email.value == "") {
 			alert("Please provide your Email!");
@@ -22,6 +38,7 @@
 			document.frmLogin.password.focus();
 			return false;
 		}
+		doLogin();
 		return (true);
 	}
 </script>
@@ -33,7 +50,7 @@
 		<hr />
 	</div>
 	<div class="body_content">
-		<form name="frmLogin">
+
 			<table class="center">
 				<tr>
 					<td>Email Address</td>
@@ -41,18 +58,16 @@
 				</tr>
 				<tr>
 					<td>Password</td>
-					<td><input type="text" name="password" id="password"></td>
+					<td><input type="password" name="password" id="password"></td>
 				</tr>
 				<tr>
-					<td><input type="submit" id="login" onclick=validate()
+					<td><input type="submit" id="login" onclick=doLogin()
 						value="Login"></td>
 				</tr>
 				<tr>
 					<td><a href="signup.html">SignUp With Email</a></td>
-
 				</tr>
 			</table>
-		</form>
 	</div>
 </body>
 </html>

@@ -8,14 +8,6 @@
 <title>Create Post</title>
 <link rel="stylesheet" type="text/css" href="stylesheets/sourcecss.css">
  <script type="text/javascript" src="stylesheets/jquery.js"></script>
-<script>
-function createQuestion() {
-   circles = $("#circles").val();
-   description = $(#"description").val();
-   $.post("/post_question",//inserting q id?
-          {"circles": circles, "description": description})
-}
-</script>
 </head>
 <body>
 	<div class="titlebar" id="header-fixed">
@@ -24,7 +16,6 @@ function createQuestion() {
 		<hr />
 	</div>
 	<div class="body_content">
-	<form name="myContact" method="post">
 		<table class=center>
 			<tr>
 				<td>Circles:</td>
@@ -40,9 +31,25 @@ function createQuestion() {
 			</tr>
 		</table>
 		<div id="create_circle">
-			<input type="submit" id="create_button" onclick = createQuestion() value="Post Question">
+			<input type="submit" id="create_button" value="Post Question">
 		</div>
-	</form>
 	</div>
 </body>
+<script>
+$("#create_button").click( function() {
+      circles = $("#circles").val()
+      description = $("#description").val();
+      $.post("/create_question",
+          {"circles": JSON.stringify([circles]), "description": description})
+      .done(function(data) {
+          window.location.href = "/main"
+      })
+      .fail(function(data) {
+          alert("fail");
+      })
+   })
+   $("#home").click(function() {
+		window.location.href = "/main";
+	});
+</script>
 </html>

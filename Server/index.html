@@ -7,11 +7,8 @@
 	content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="keywords" content="">
 <title>Main Page</title>
-<link rel="stylesheet" type="text/css" href="/html/sourcecss.css">
-<script type="text/javascript" src="/html/jquery.js"></script>
-<script>
-
-</script>
+<link rel="stylesheet" type="text/css" href="/html/stylesheets/sourcecss.css">
+<script type="text/javascript" src="/html/stylesheets/jquery.js"></script>
 </head>
 <body>
 	<div class="titlebar" id="header-fixed">
@@ -21,21 +18,21 @@
 	</div>
 	<div class="body_content">
 		<div class="menubar">
-			<input type="button" id="content" class="add_question" value="Add Question" /> <input
-				type="button" id="content" value="Notifications" /> <input
-				type="button" id="content" value="More" /> <select
-				name="circle_select">
+			<input type="button" id="content" class="add_question"
+				value="Add Question" /> <input type="button" id="content" class = "notifications"
+				value="Notifications" /> <input type="button" id="content" class = "navigations"
+				value="More" /> <select name="circle_select">
 				<option value="All Circles">All Circles</option>
 				<option value="Family">Family</option>
 			</select>
 		</div>
 		<hr />
 		<table id="content_main_table">
-		{% for question in questions %}
+			{% for question in questions %}
 			<tr>
 				<div id="toggler1">
-					<td><img src="/html/favorite_blank.jpg" id="favorite_image"></img> <img
-						src="/html/favorite_voted.jpg" width="360px" height="150px"
+					<td><img src="/html/favorite_blank.jpg" id="favorite_image"></img>
+						<img src="/html/favorite_voted.jpg" width="360px" height="150px"
 						style="display: none" /></td>
 					<div id="toggler1">
 						<div class="questions">
@@ -43,7 +40,8 @@
 								<td><strong>{{question.description}} <br /></td>
 			</tr>
 			<tr>
-				<td><input type="button" id="vote_count" value="1"></td> </strong>
+				<td><input type="button" id="vote_count" value="1"></td>
+				</strong>
 				<td>Srikanth, Graduate Student</td>
 			</tr>
 			<tr>
@@ -54,15 +52,15 @@
 			</tr>
 			<tr>
 				<td />
-				<td><a href="#">Upvote</a> <a href="#">Downvote</a> <!-- how to give on click function -->
+				<td><a href="/vote">Upvote</a> <a href="#">Downvote</a> <!-- how to give on click function -->
 				</td>
 			</tr>
 			</div>
 			<tr>
 				<td colspan="9"><hr size="1" width="100%" /></td>
 			</tr>
-	     {% endfor %}
-	</table>
+			{% endfor %}
+		</table>
 	</div>
 	<div id="more" align="center">
 		<input type="button" id="more_button" value="More">
@@ -70,20 +68,20 @@
 	</div>
 </body>
 <script>
-$(".add_question").click(function() {
-      window.location.href="/html/post_question.html";
-});
+	$(".add_question").click(function() {
+		window.location.href = "/html/post_question.html";
+	});
 
-$(".notifications").click(function() {
-      window.location.href="/html/NotificationsPage.html";
-});
+	$(".notifications").click(function() {
+		window.location.href = "/html/NotificationsPage.html";
+	});
 
-$(".more").click(function() {
-      window.location.href="/html/NavigationPage.html";
-});
+	$(".more").click(function() {
+		window.location.href = "/html/NavigationPage.html";
+	});
 
-$("#home").click(function() {
-      window.location.href="/main";
-});
+	$("#home").click(function() {
+		window.location.href = "/main";
+	});
 </script>
 </html>
