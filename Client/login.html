@@ -6,10 +6,24 @@
     <meta name="keywords" content="">
     <title>Login</title>
    <link rel="stylesheet" type="text/css" href="sourcecss_login.css">
-   <script language="Javascript" type="text/Javascript" src="javasource.js"></script>
    </head>
-  <body>
-  <p/>
+   <script type="text/javascript" src="jquery.js"></script>
+   <script>
+   function doLogin() {
+   email = $("#email").val();
+   password= $("#password").val();
+   $.post("/login",
+          {"email": email, "password": password})
+   .done(function(data) {
+          if(data === "Success")
+            window.location.href="/html/index.html";
+          else
+            alert("Failure")
+   })
+   }
+ </script>
+<body>
+ <p/>
 <hr/>
 <input type = "button" id="header" value = "Quora+">
 <hr/>
@@ -17,7 +31,7 @@
 <tr>
 	  <td>
   		Email Address
-      <input type="text" name="email" id="email">
+      <input type="text" id="email">
     </td>
   </tr>
   <tr/>
@@ -25,16 +39,15 @@
   <tr>
   	<td>
     	<p>Password
-  <input type="text" name="password" id="password">
+  <input type="password" id="password">
   </p>
     	<p><br/>
-    	  <input type = "button" value = "Login">
+    	  <input type = "button" onclick = doLogin()  value = "Login" >
     </p></td>
     <br/>
   </tr>
   <tr>
 	<a href="signup.html">SignUp With Email</a>
-    
   </tr>
 </form></p>
 </body>

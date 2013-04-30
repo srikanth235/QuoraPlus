@@ -7,7 +7,8 @@
 <title>Create Contact</title>
 <link rel="stylesheet" type="text/css" href="sourcecss.css">
  <script type="text/javascript" src="jquery.js"></script>
- <script>function createContact() {
+ <script>
+ function createContact() {
 	   name = $("#name").val();
 	   email = $("#email").val();
 	   circles = $("#circles").val();
@@ -19,7 +20,8 @@
 	   .fail(function() {
 	        $("body").html("Try Again!");
 	   })
-	}</script>
+	}
+</script>
 </head>
 <body>
 	<hr />

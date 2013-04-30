@@ -1,5 +1,141 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="keywords" content="">
+<title>Main Page</title>
+<link rel="stylesheet" type="text/css" href="sourcecss.css">
+<script type="text/javascript" src="jquery.js"></script>
+<script>
+ function vote() {
+   name = $("#name").val();
+  // email = $("#email").val();???how to get email
+   state = $("#").val();///????
+   $.post("/vote",
+          {"name"= name,"email"= email, "description" = description})///??how to get email id
+   .done(function(data) {
+        window.location.href = "/main_page";///????
+   })
+   .fail(function() {
+        $("body").html("Try Again!");
+   })
+}
+ function favorite() {
+	   name = $("#name").val();
+	  // email = $("#email").val();
+	   description = $("#description").val();
+	   $.post("/vote",
+	          {"name"= name,"email"= email, "description" = description})///??how to get email id
+	   .done(function(data) {
+	        window.location.href = "/main_page";///????
+	   })
+	   .fail(function() {
+	        $("body").html("Try Again!");
+	   })
+}
+</script>
+</head>
 <body>
-Hello World!!!
+	<hr>
+	<div class="titlebar" data-role="header" data-position="fixed">
+		<input type="button" id="home" value="Quora+">
+	</div>
+	<hr />
+	<div class="menubar">
+		<input type="button" id="add_question" value="Add Question" /> 
+		<input type="button" id="notifications" value="Notifications" /> 
+		<input type="button" id="content" value="More" /> 
+		    <select name="circle_select">
+			<option value="All Circles">All Circles</option>
+			<option value="Family">Family</option>
+			<option value="Friends">Friends</option>
+		</select>
+	</div>
+	<hr />
+	<table id="content_main_table">
+		<tr>
+		<div id="toggler1">
+			<td><img src="favorite_blank.jpg" id="favorite_image"></img>
+			<img src="favorite_voted.jpg" width="360px" height="150px" style="display:none"/></td>
+		<div id="toggler1">
+			<div class="questions">
+				<div id="question_content">
+					<td><strong>Web Programming: What is the most
+							non-boring way to learn web programming? <br /></td>
+		</tr>
+		<tr>
+			<td><input type="button" id="vote_count" value="1"></td>
+			<td>Srikanth, Graduate Student</td>
+			</strong>
+		</tr>
+		<tr>
+			<td />
+			<td>I honestly opine that going through standard text books can
+				be boring. I can share my 2 cents about how I tackled the situation.
+			</td>
+		</tr>
+		<tr>
+			<td/>
+			<td>
+				<a href = "#">Upvote</a>
+				<a href = "#">Downvote</a> <!-- how to give on click function -->
+			</td>
+		</tr>
+		</div>
+		<tr>
+			<td colspan="9"><hr size="1" width="100%" /></td>
+		</tr>
+		<tr>
+			<td><img src="favorite_blank.jpg" id="favorite_image"></img></td>
+			<td>
+				<div id="question_content">
+					<strong>Web Programming: How is this when taken as a
+						subject? <br />
+			</td>
+		</tr>
+		<tr>
+			<td><input type="button" id="vote_count" value="1"></td>
+			<td>Vishnu Priya, Graduate Student</td>
+			</strong>
+			</td>
+		</tr>
+		<tr>
+			<td />
+			<td>Its pretty good though!</td>
+		</tr>
+		</div>
+		<tr>
+			<td colspan="9"><hr size="1" width="100%" /></td>
+		</tr>
+		<tr>
+			<td><img src="favorite_blank.jpg" id="favorite_image"></img></td>
+			<td>
+				<div id="question_content">
+					<strong>Web Programming: How is this when taken as a
+						subject? <br />
+			</td>
+		</tr>
+		<tr>
+			<td><input type="button" id="vote_count" value="1"></td>
+			<td>Vishnu Priya, Graduate Student</td>
+			</strong>
+			</td>
+		</tr>
+		<tr>
+			<td />
+			<td>Its pretty good though!</td>
+		</tr>
+		</div>
+		<tr>
+			<td colspan="9"><hr size="1" width="100%" /></td>
+		</tr>
+	</table>
+
+	</div>
+	<div id="more" align="center">
+		<input type="button" id="more_button" value="More">
+	</div>
 </body>
 </html>

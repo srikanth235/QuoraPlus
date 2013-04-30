@@ -16,7 +16,8 @@ function createUser() {
    $.post("/create_user",
           {"email": email, "password": password, "first_name": first_name, "last_name": last_name})
    .done(function(data) {
-        	$("body").html("Try Again!");
+          if(data === "Success")
+            window.location.href="/html/login.html";
    })
  }
 </script>
@@ -27,7 +28,6 @@ function createUser() {
 		<input type="button" id="home" value="Quora+">
 	</div>
 	<hr />
-	<form name="myContact" method="post">
 		<table class=center>
 			<tr>
 				<td>First Name:</td>
@@ -54,6 +54,5 @@ function createUser() {
 		<div id="create_circle">
 			<input type="submit" id="create_button" onclick = createUser() value="Create User">
 		</div>
-	</form>
 </body>
 </html>
