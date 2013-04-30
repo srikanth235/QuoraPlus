@@ -34,119 +34,121 @@ from model import *
 
 class Main(webapp2.RequestHandler):
     def get(self):
-          self.response.out.write("Hello, Welcome to Quora+")
+          self.redirect("/html/index.html")
 
 class CreateUser(webapp2.RequestHandler):
     def post(self):
-          user = User.create_user(
-                    email=self.request.get("email"),
-                    password=self.request.get("password"),
-                    first_name=self.request.get("first_name"),
-                    last_name=self.request.get("last_name"))
-          if user is None:
-              self.response.out.write("Failure")
+          user, result = User.create_user(
+                            email=self.request.get("email"),
+                            password=self.request.get("password"),
+                            first_name=self.request.get("first_name"),
+                            last_name=self.request.get("last_name"))
+          if result:
+              self.redirect("/login")
           else:
-              self.respone.out.write("Success")
-
-class CreateQuestion(webapp2.RequestHandler):
-    def post(self, user_id=None):
-        circles = simplejson.loads(self.request.get("circles"))
-        result = Question.create_question(
-                    email=user_id,
-                    description=self.request.get("description"),
-                    circles=circles
-                   )
-        
-        if result:
-            self.response.out.write("Success")
-        else:
-            self.response.out.write("Failure")
-
-class CreateAnswer(webapp2.RequestHandler):
-    def post(self, question_id=None):
-        answer = Answer.create_answer(
-                        question_id=int(question_id),
-                        email=self.request.get("email"),
-                        description=self.request.get("description"),
-                    )
-        key = ndb.Key(Question, int(question_id))
-        email = key.get().email
-        Notification.create_notification(email=email,
-                                         data=[self.request.get("email"), self.request.get("name")], 
-                                         creator_email=self.request.get("email"),
-                                         type=2)
-        if answer is None:
-            self.response.out.write("Failure")
-        else:
-            self.response.out.write("Success")
+              self.response.out.write("Failure")
 
 class CreateCircle(webapp2.RequestHandler):
-    def post(self, question_id=None):
-        circle = circle.create_answer(
-                        question_id=question_id,
+    def post(self, user_id=None):
+        circle = Circle.create_circle(
                         description=self.request.get("description"),
-                        email=self.request.get("email")
+                        email=self.request.get("email"),
+                        name=self.request.get("name")
                     )
         if circle is None:
             self.response.out.write("Failure")
         else:
             self.response.out.write("Success")
 
-class CreateContact(webapp2.RequestHandler):
-    def post(self, user_id=None):
-        cicle_names = simplejson.loads(self.request.get("circles"))
-        contact = Contact.create_contact(
-                        circle_names=circle_names,
-                        contact_email=self.request.get("email"),
-                        email=user_id,
-                        name=self.request.get("name")
-                    )
-        qry = Contacts.query(ndb.AND(email=user_id, user_email=self.request.get("email"))).fetch()
-        if len(qry) > 0:
-            data = qry[0].circles
-        Notification.create_notification(email=contact_email, creator_email=email, type=1, data=circles)
-        if contact is None:
+class CreateQuestion(webapp2.RequestHandler):
+    def post(self):
+        circles = simplejson.loads(self.request.get("circles"))
+        question, result = Question.create_question(
+                    email=self.request.get("email"),
+                    description=self.request.get("description"),
+                    circles=circles
+                   )
+        if result:
+            id = question.key.id()
+            self.response.out.write(id)
+        else:
             self.response.out.write("Failure")
+
+class CreateAnswer(webapp2.RequestHandler):
+    def post(self):
+        question_id = int(self.request.get("question_id"))
+        answer, result = Answer.create_answer(
+                        question_id=question_id,
+                        email=self.request.get("email"),
+                        description=self.request.get("description"),
+                    )
+        key = ndb.Key(Question, question_id)
+        email = key.get().email
+        Notification.create_notification(email=email,
+                                         data=[self.request.get("email"), self.request.get("name")], 
+                                         creator_email=self.request.get("email"),
+                                         type=2)
+        if result:
+            self.response.out.write(answer.key.id())
         else:
             self.response.out.write("Success")
+
+
+class CreateContact(webapp2.RequestHandler):
+    def post(self):
+        circles = simplejson.loads(self.request.get("circles"))
+        result = Contact.create_contact(
+                        circles=circles,
+                        email=self.request.get("email"),
+                        user_email=self.request.get("user_email"),
+                        name=self.request.get("name")
+                    )
+        qry = Contact.query(ndb.AND(Contact.email == self.request.get("email"),
+                                     Contact.user_email == self.request.get("user_email"))).fetch()
+        if len(qry) > 0:
+            data = qry[0].circles
+        result = Notification.create_notification(email=self.request.get("email"), 
+                                         creator_email=self.request.get("user_email"),
+                                         type=1,
+                                         data=circles)
+        if result:
+            self.response.out.write("Success")
+        else:
+            self.response.out.write("Failure")
             
 class MarkVote(webapp2.RequestHandler):
-    def post(self, answer_id=None):
-        vote = Vote.create_or_update_vote(
+    def post(self):
+        answer_id = int(self.request.get("answer_id"))
+        state = int(self.request.get("state"))
+        vote, result = Vote.create_or_update_vote(
                         answer_id=answer_id,
                         email=self.request.get("email"),
                         name=self.request.get("name"),
-                        state=self.request.get("state")
+                        state=state
                     )
-        if vote is None:
-            self.response.out.write("Failure")
+        if result:
+            answer, status = Answer.update_vote_count(answer_id, vote.state)
+            self.response.out.write(answer.parent.key.id())
         else:
-            self.response.out.write("Success")
+            self.response.out.write("Failure")
 
 class MarkFavorite(webapp2.RequestHandler):
-    def post(self, user_id=None):
-        favorite = Favorite.create_or_update_favorite(
-                        email=user_id,
-                        question_id=self.request.get("question_id")
-                    )
-        if favorite is None:
-            self.response.out.write("Failure")
+    def post(self):
+        favorite, result = Favorite.create_or_update_favorite(
+                            email=self.request.get("email"),
+                            question_id=int(self.request.get("question_id")))
+        if result:
+            self.response.out.write(favorite.question_ids)
         else:
-            self.response.out.write("Success")
-
-def LoadHeader(email):
-    result = {}
-    result['no_of_notifications'] = fetch_no_of_unread_notifications(email)
-    result['circles'] = fetch_circles(email) #projected only circle name
-    return simplejson.dumps(result);
+            self.response.out.write("Failure")
     
 class Login(webapp2.RequestHandler):
     def post(self):
         if User.is_valid_user(self.request.get("email"),
                               self.request.get("password")):
-            return LoadHeader(self.request.get("email"))
+            self.redirect("/html/index.html")
         else:
-            self.response.out.write("Failure")
+            self.response.out.write("/html/login.html")
 
 class MainPage(webapp2.RequestHandler):
     def post(self):
@@ -176,21 +178,22 @@ class MainPage(webapp2.RequestHandler):
                 voters.append(voter.name)
                 if email == voter.email:
                     is_upvote = True
-            is_favorite = Favorite.is_favorite(email, tuple[0].key.integer_id())
+            is_favorite = Favorite.is_favorite(email, tuple[0].key.id())
             list.append([tuple[0], tuple[1], tuple[2], tuple[3], voters, is_upvote, is_favorite])
         result["questions"] = list
-        return simplejson.dumps(result)
+        self.response.out.write(simplejson.dumps(result))
 
 class NotificationsPage(webapp2.RequestHandler):
     def post(self):
         email = self.request.get("email")
         curs = Cursor(urlsafe=self.request.get("cursor"))
-        notifications, next_curs, more = Notification.fetch_unread_notifications(email)
+        notifications, next_curs, more = Notification.fetch_unread_notifications(email, curs)
         result = {}
         result["notifications"] = notifications
-        result["next_curs"] = next_curs.url_safe()
+        if next_curs is not None:
+            result["next_curs"] = next_curs.url_safe()
         result["more"] = more
-        return simplejson.dumps(result)
+        self.response.out.write(simplejson.dumps(result))
 
 class ClearNotificationsPage(webapp2.RequestHandler):
     def post(self):
@@ -203,12 +206,12 @@ class FavoritePage(webapp2.RequestHandler):
         
 ###### ROUTES and WSGI STUFF ######
 url_routes = []
-# url_routes.append(
-#     routes.RedirectRoute(r'/',
-#                          handler=Main,
-#                          strict_slash=True,
-#                          name="main")
-# )
+url_routes.append(
+    routes.RedirectRoute(r'/',
+                         handler=Main,
+                         strict_slash=True,
+                         name="main")
+)
 
 url_routes.append(
     routes.RedirectRoute(r'/create_user',
@@ -217,44 +220,46 @@ url_routes.append(
                          name="create_user")
 )
 
+ 
 url_routes.append(
-    routes.RedirectRoute(r'/<email:\.+>/create_question',
+    routes.RedirectRoute(r'/create_circle',
+                         handler=CreateCircle,
+                         strict_slash=True,
+                         name="create_circle")
+)
+
+url_routes.append(
+    routes.RedirectRoute(r'/create_question',
                          handler=CreateQuestion,
                          strict_slash=True,
                          name="create_question")
 )
 
 url_routes.append(
-    routes.RedirectRoute(r'/<question_id:\d+>/create_answer',
+    routes.RedirectRoute(r'/create_answer',
                          handler=CreateAnswer,
                          strict_slash=True,
                          name="create_answer")
 )
+
  
 url_routes.append(
-    routes.RedirectRoute(r'/<user_id:\d+>/create_circle',
-                         handler=CreateCircle,
-                         strict_slash=True,
-                         name="create_circle")
-)
- 
-url_routes.append(
-    routes.RedirectRoute(r'/<user_id:\d+>/create_contact',
+    routes.RedirectRoute(r'/create_contact',
                          handler=CreateContact,
                          strict_slash=True,
                          name="create_contact")
 )
  
 url_routes.append(
-    routes.RedirectRoute(r'/<answer_id:\d+>/vote',
-                         handler=Mark_Vote,
+    routes.RedirectRoute(r'/vote',
+                         handler=MarkVote,
                          strict_slash=True,
                          name="vote")
 )
  
 url_routes.append(
-    routes.RedirectRoute(r'/<user_id:\d+>/create_favorite',
-                         handler=Mark_Favorite,
+    routes.RedirectRoute(r'/favorite',
+                         handler=MarkFavorite,
                          strict_slash=True,
                          name="favorite")
 )

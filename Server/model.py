@@ -35,8 +35,8 @@ class User(ndb.Model):
                         first_name=first_name,
                         last_name=last_name)
             user.put()
-            return user
-        return None
+            return user, True
+        return None, False
 
     @classmethod
     def is_valid_user(cls, self, email, password):
@@ -54,6 +54,34 @@ class User(ndb.Model):
         user = key.get()
         return user
 
+class Circle(ndb.Model):
+    """Models circles on  Quora+"""
+    date_created = ndb.DateProperty(indexed=False, auto_now_add=True)
+    description = ndb.StringProperty(indexed=False)
+    name = ndb.StringProperty(indexed=True)
+    email = ndb.StringProperty(indexed=True)
+
+    @classmethod 
+    @ndb.transactional(retries=1)
+    def create_circle(cls, name, email, description):
+        key = ndb.Key(Circle, name)
+        if key.get() is None:
+            circle = Circle(key=key,
+                            description=description,
+                            email = email,
+                            name=name)
+            circle.put()
+            return True
+        return False
+
+    @classmethod
+    def fetch_circles(cls, email):
+        circles = []
+        qry = Circle.query(Circle.email == email).fetch(projection=[Circle.name])
+        for row in qry:
+            circles.append(qry.name)
+        return circles
+
 class Question(ndb.Model):
     """Models an individual Question on  Quora+"""
     date_created = ndb.DateProperty(indexed=True, auto_now=True)
@@ -64,16 +92,12 @@ class Question(ndb.Model):
     @classmethod 
     @ndb.transactional(retries=1)
     def create_question(cls, email, description, circles):
-        qry = Question.query(ndb.AND(Question.email == email,
-                                     Question.description == description))
-
-        if len(qry) == 0:
-            question = Question(email=email,
-                                description=description,
-                                circles=circles)
-            question.put()
-            return True
-        return False
+        question = Question(email=email,
+                            description=description,
+                            circles=circles)
+        question.put()
+        return question, True
+        
 
     @classmethod
     def fetch_questions(cls, email, curs, circle, question_ids):
@@ -118,7 +142,7 @@ class Notification(ndb.Model):
     @ndb.transactional(retries=1)
     def mark_as_read(cls, email, identifier=None):
         if identifier is None:
-            notifications = Notification.query(ndb.AND(email==email, is_read==False))
+            notifications = Notification.query(ndb.AND(Notification.email==email, Notification.is_read==False))
         else:
             key = ndb.Key(Notification, identifier)
             notifications = [key.get()]
@@ -129,36 +153,12 @@ class Notification(ndb.Model):
 
     @classmethod
     def fetch_no_of_unread_notifications(cls, email):
-         return len(Notification.query(ndb.AND(email==email, is_read==False)))
+         return len(Notification.query(ndb.AND(Notification.email==email, Notification.is_read==False)).fetch())
     
     @classmethod
-    def fetch_unread_notifications(cls, email):
-        notifications, next_cur, more = Notifications.query(ndb.AND(email==email, is_read==False)).fetch_page(20, start_cursor=curs)
-        return notifications, next_cur, more
-
-class Circle(ndb.Model):
-    """Models circles on  Quora+"""
-    date_created = ndb.DateProperty(indexed=False, auto_now_add=True)
-    description = ndb.StringProperty(indexed=False)
-    name = ndb.StringProperty(indexed=True)
-    email = ndb.StringProperty(indexed=True)
-
-    @classmethod 
-    @ndb.transactional(retries=1)
-    def create_circle(cls, name, email, description):
-        qry = Circle.query(ndb.AND(Circle.name == name, email == email))
-        if len(qry) == 0:
-            circle = Circle(description=description,
-                            email = email,
-                            name=name)
-            circle.put()
-            return True
-        return False
-
-    @classmethod
-    def fetch_circles(cls, email):
-        qry = Circle.query(Circle.email == email).fetch(projection=[Circle.name])
-        return qry
+    def fetch_unread_notifications(cls, email, curs=None):
+        notifications, next_curs, more = Notification.query(ndb.AND(Notification.email==email, Notification.is_read==False)).fetch_page(20, start_cursor=curs)
+        return notifications, next_curs, more
 
 class Answer(Question):
     """Models answer on Quora+"""
@@ -176,31 +176,43 @@ class Answer(Question):
     @classmethod
     @ndb.transactional(retries=1)
     def create_answer(cls, question_id, email, description):
-        parent = ndb.Key(Question, question_id)
-        answer = Answer(description=description,
+        key = ndb.Key(Question, question_id)
+        answer = Answer(parent=key,
+                        description=description,
                         email=email)
         answer.put()
-        return True
+        return answer, True
+
+    @classmethod
+    @ndb.transactional(retries=1)
+    def update_vote_count(cls, answer_id, state):
+        key = ndb.Key(Answer, answer_id)
+        answer = key.get()
+        if state:
+            answer.upvote_count = answer.upvote_count - 1
+        else:
+            answer.upvote_count = answer.upvote_count + 1
+        answer.put()
+        return answer, True
 
 class Vote(ndb.Model):
     """Models upvoting on Quora+"""
     email = ndb.StringProperty(indexed=True)
-    state = ndb.IntegerProperty(indexed=True, default=1) #1 upvote, 0 downvote
+    state = ndb.IntegerProperty(indexed=True, default=0) #0 upvote, 1 downvote
     answer_id = ndb.IntegerProperty(indexed=True)
     name = ndb.StringProperty(indexed=False)
     @classmethod
     @ndb.transactional(retries=1)
     def create_or_update_vote(cls, answer_id, email, name, state):
-        qry = Vote.query(ndb.AND(Vote.email == email,
-                                 Vote.answer_id == answer_id))
-        if len(qry) == 0:
-            vote = Vote(email=voter_email, answerd_id=answer_id, name=name, state=state)
-            vote.put()
+        key = ndb.Key(Vote, str(answer_id) + " " + email)
+        if key.get() is None:
+           vote = Vote(key=key, email=email, answer_id=answer_id, name=name, state=state)
+           vote.put()
         else:
-            vote = qry[0]
+            vote = key.get()
             vote.state = 1 - vote.state
             vote.put()
-        return True
+        return vote, True
 
     @classmethod
     def fetch_voters(cls, answer_id):
@@ -208,23 +220,23 @@ class Vote(ndb.Model):
 
 class Favorite(ndb.Model):
     """Models favorite on Quora+"""
-    question_ids = ndb.StringProperty(indexed=True, repeated=True)
-    email = ndb.StringProperty(indexed=True)
+    question_ids = ndb.IntegerProperty(indexed=True, repeated=True)
     @classmethod
     @ndb.transactional(retries=1)
     def create_or_update_favorite(cls, email, question_id):
-        key = ndb.Key(User, email)
+        key = ndb.Key(Favorite, email)
         if key.get() is None:
-            favorite = Favorite(question_ids=[question_id])
+            favorite = Favorite(key=key, question_ids=[])
+            favorite.question_ids.append(question_id)
             favorite.put()
         else:
             favorite = key.get()
             if question_id in favorite.question_ids:
-                favorite.question_ids = favorite.question_ids.remove(question_id)
+                favorite.question_ids.remove(question_id)
             else:
                 favorite.questions_ids.append(question_id)
             favorite.put()
-        return True
+        return favorite, True
 
     @classmethod
     def is_favorite(cls, email, question_id):
@@ -237,13 +249,13 @@ class Contact(User):
     date_created = ndb.DateTimeProperty(indexed=True, auto_now=True)
     circles = ndb.StringProperty(repeated=True, indexed=False)
     user_email = ndb.StringProperty(indexed=True)
+    name = ndb.StringProperty(indexed=False)
     @classmethod
     @ndb.transactional(retries=1)
     def create_contact(cls, circles, email, user_email, name):
-        qry = Contact.query(ndb.AND(Contact.email == email,
-                                    Contact.user_email == user_email))
-        if len(qry) == 0:
-            contact = Contact(email=email, user_email=user_email, name=name, cicles=circles)
+        key = ndb.Key(Contact, email + " " + user_email)
+        if key.get() is None:
+            contact = Contact(key=key, email=email, user_email=user_email, name=name, circles=circles)
             contact.put()
             return True
         return False
