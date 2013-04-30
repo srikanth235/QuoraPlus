@@ -183,7 +183,10 @@ class MainPage(webapp2.RequestHandler):
         #result["questions"] = list
         result["questions"] = ["what is testing"]
         circles = Circle.fetch_circles(email)
-        return {'questions' : questions, 'circles' :circles}
+        pairs = []
+        for question in questions:
+            pairs.append([question, Answer.fetch_answer(question.key.id())])
+        return {'questions' : pairs, 'circles' :circles}
         #path = os.path.join(os.path.dirname(__file__), '../Client/index.html')
         #self.response.out.write(template.render(path,
         #                          {'questions': result["questions"]

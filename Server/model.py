@@ -44,7 +44,7 @@ class User(ndb.Model):
         user = key.get()
         if user is None:
             return False
-        elif password == user.password:
+        #elif password == user.password:
             return True
         return False
     
@@ -176,7 +176,8 @@ class Answer(Question):
     date_created = ndb.DateProperty(auto_now_add=True)
     email = ndb.StringProperty(indexed=True)
     upvote_count = ndb.IntegerProperty(default=0, indexed=True)
-
+    question_id = ndb.IntegerProperty(indexed=True)
+    
     def callback(self, question):
         answer = Answer.query(parent=question.key()).fetch().order(-Answer.upvote_count)
         answer_id = answer.key().integer_id()
@@ -189,9 +190,16 @@ class Answer(Question):
         key = ndb.Key(Question, question_id)
         answer = Answer(parent=key,
                         description=description,
-                        email=email)
+                        email=email,
+                        question_id=question_id)
         answer.put()
         return answer, True
+    @classmethod
+    def fetch_answer(cls, question_id):
+        answer = Answer.query(Answer.question_id == question_id).fetch()
+        if len(answer) > 0:
+            return answer[0]
+        return None
 
     @classmethod
     @ndb.transactional(retries=1)

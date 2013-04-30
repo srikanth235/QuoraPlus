@@ -17,6 +17,7 @@
        $.post("/login",
              {"email": email, "password": password})
        .done(function(data) {
+          alert(data)
           if(data === "Success") {
             localStorage['email'] = email;
             localStorage['name'] = email

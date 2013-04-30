@@ -1,29 +1,41 @@
-html, body
-{
- margin: 0;
- padding: 0; 
- border: 0;
+html,body {
+	margin: 0;
+	padding: 0;
+	border: 0;
 }
 
-body 
-{
- font-family:Arial,  sans-serif;
- line-height:1.5;
- font-size:16px;
- background: #fff;
- padding:5px;
- color: #000;
- word-wrap: break-word;
- -webkit-text-size-adjust: none;
+body {
+	font-family: Arial, sans-serif;
+	line-height: 1.5;
+	font-size: 16px;
+	background: #fff;
+	padding: 5px;
+	color: #000;
+	word-wrap: break-word;
+	-webkit-text-size-adjust: none;
 }
 
-h1, h2, h3, h4, h5, h6{ font-weight: normal; }
+h1,h2,h3,h4,h5,h6 {
+	font-weight: normal;
+}
 
-p img { float: left; margin: 0 10px 5px 0; padding: 0; }
+p img {
+	float: left;
+	margin: 0 10px 5px 0;
+	padding: 0;
+}
 
-img { border: 0; max-width: 100%; }	
+img {
+	border: 0;
+	max-width: 100%;
+}
 
-table { width:auto; border-collapse: collapse;border-spacing: 0; }
+table {
+	width: auto;
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
 #home {
 	margin: 0px, 0px, 0px, 0px;
 	background-color: #FF3333;
@@ -32,31 +44,17 @@ table { width:auto; border-collapse: collapse;border-spacing: 0; }
 	height: 25px;
 	margin-bottom: 0px;
 }
-body{
-	margin:0 auto;
-	font-size:10px;
+
+body {
+	margin: 0 auto;
+	font-size: 10px;
 }
+
 #content {
 	width: 90px;
 	height: 20px;
 }
-div#header-fixed {
-	width:100%;
-    position:fixed;
-    z-index:10;
-	top:0px;
-    background:inherit;
-}
 
-div.header {  
-data-position:fixed; height:50px; top:0px; margin:auto; z-index:100000; width:100%;
-}
-div.body_content { 
- width:100%;
- padding-top:43px;
- z-index:5;
- overflow:auto;
-}
 #Circles {
 	position: absolute;
 	right: 0px;
@@ -87,30 +85,34 @@ div.body_content {
 	margin-left: auto;
 	margin-right: auto;
 }
+
 #create_button {
-	width: 100px;
+	width: 250px;
 	height: 30px;
 }
 
 #down_button {
-	width: 100px;
+	width: 250px;
 	height: 30px;
 }
+
 #circles {
 	margin: 0px, 0px, 0px, 0px;
 	background-color: #FFFFFF;
 	border-color: green;
 	float: right;
-	margin-left:6px;
+	margin-left: 6px;
 }
-#content_main_table{
+
+#content_main_table {
 	border-collapse: collapse;
-  	border-spacing: 0;
-  	margin: 0px;
+	border-spacing: 0;
+	margin: 0px;
 }
-table.center{
+
+table.center {
 	margin-left: auto;
 	margin-right: auto;
-	margin:50px auto;
-    padding: 20px;
+	margin: 50px auto;
+	padding: 20px;
 }
