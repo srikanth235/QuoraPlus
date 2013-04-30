@@ -3,52 +3,56 @@
 <head>
 <meta charset="utf-8">
 <meta name="description" content="">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="keywords" content="">
 <title>Login</title>
-<link rel="stylesheet" type="text/css" href="sourcecss_login.css">
-</head>
-<script type="text/javascript" src="jquery.js"></script>
+<link rel="stylesheet" type="text/css" href="stylesheets/sourcecss.css">
+<script type="text/javascript" src="stylesheets/jquery.js"></script>
+<script src="stylesheets/javasource.js"></script>
 <script>
-   function doLogin() {
-   email = $("#email").val();
-   password= $("#password").val();
-   $.post("/login",
-          {"email": email, "password": password})
-   .done(function(data) {
-          if(data === "Success")
-            window.location.href="/html/index.html";
-          else
-            alert("Failure")
-   })
-   }
- </script>
+	function validate() {
+		if (document.frmLogin.email.value == "") {
+			alert("Please provide your Email!");
+			document.frmLogin.email.focus();
+			return false;
+		}
+		if (document.frmLogin.password.value == "") {
+			alert("Please provide your Password!");
+			document.frmLogin.password.focus();
+			return false;
+		}
+		return (true);
+	}
+</script>
+</head>
 <body>
-	<p />
-	<hr />
-	<input type="button" id="header" value="Quora+">
-	<hr />
-	<form>
-		<tr>
-			<td>Email Address <input type="text" id="email">
-			</td>
-		</tr>
-		<tr />
-		<tr />
-		<tr>
-			<td>
-				<p>
-					Password <input type="password" id="password">
-				</p>
-				<p>
-					<br /> <input type="button" onclick=doLogin() value="Login">
-				</p>
-			</td>
-			<br />
-		</tr>
-		<tr>
-			<a href="signup.html">SignUp With Email</a>
-		</tr>
-	</form>
-	</p>
+	<div class="titlebar" id="header-fixed">
+		<hr />
+		<input type="button" id="home" value="Quora+">
+		<hr />
+	</div>
+	<div class="body_content">
+		<form name="frmLogin">
+			<table class="center">
+				<tr>
+					<td>Email Address</td>
+					<td><input type="text" name="email" id="email"></td>
+				</tr>
+				<tr>
+					<td>Password</td>
+					<td><input type="text" name="password" id="password"></td>
+				</tr>
+				<tr>
+					<td><input type="submit" id="login" onclick=validate()
+						value="Login"></td>
+				</tr>
+				<tr>
+					<td><a href="signup.html">SignUp With Email</a></td>
+
+				</tr>
+			</table>
+		</form>
+	</div>
 </body>
 </html>

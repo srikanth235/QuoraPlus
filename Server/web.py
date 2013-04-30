@@ -24,11 +24,11 @@ from webapp2_extras import routes
 from google.appengine.api import memcache
 from google.appengine.api import users
 from google.appengine.ext import ndb
-
+from google.appengine.ext.webapp import template
 
 # from helpers import FunctionLoader, jinja2_template_loader
 # from helpers import jinja2_environment
-# from helpers import template_handler, json_handler
+from helpers import template_handler, json_handler
 
 from model import *
 
@@ -68,9 +68,10 @@ class CreateQuestion(webapp2.RequestHandler):
                     description=self.request.get("description"),
                     circles=circles
                    )
+        
         if result:
             id = question.key.id()
-            self.response.out.write(id)
+            self.response.out.write(question.key.id())
         else:
             self.response.out.write("Failure")
 
@@ -151,14 +152,12 @@ class Login(webapp2.RequestHandler):
             self.response.out.write("Failure")
 
 class MainPage(webapp2.RequestHandler):
-    def post(self):
-        results = {}
+    @template_handler('index.html')
+    def get(self):
+        result = {}
         email = self.request.get("email")
         curs = Cursor(urlsafe=self.request.get("cursor"))
-        if self.request.get("circle_name"):
-            circle = self.request.get("circle_name")
-        else:
-            circle = None
+        circle = self.request.get("circle_name")
         question_list = []
         if self.request.get("want_favorites"):
             qry = Favorite.query(email==email).fetch()
@@ -166,22 +165,29 @@ class MainPage(webapp2.RequestHandler):
                 question_list.append(row.key().integer_id())
         if self.request.get("question_id"):
             question_list.append(int(self.request.get("question_id")))
-        next_curs, more, questions = fetch_question(email, curs, circle, question_list)
-        result["next_curs"] = next_curs
-        result["more"] = more
-        list = []
-        for tuple in questions:
+        questions = Question.fetch_questions(email, curs, circle, question_list)
+       # result["next_curs"] = next_curs
+       # result["more"] = more
+       # list = []
+        
+        #for tuple in questions:
             #question, top answer, # of answers, voters
-            is_upvote = False
-            voters = []
-            for voter in tuple[3]:
-                voters.append(voter.name)
-                if email == voter.email:
-                    is_upvote = True
-            is_favorite = Favorite.is_favorite(email, tuple[0].key.id())
-            list.append([tuple[0], tuple[1], tuple[2], tuple[3], voters, is_upvote, is_favorite])
-        result["questions"] = list
-        self.response.out.write(simplejson.dumps(result))
+         #   is_upvote = False
+         #   voters = []
+         #   for voter in tuple[3]:
+         #       voters.append(voter.name)
+         #       if email == voter.email:
+         #           is_upvote = True
+         #   is_favorite = Favorite.is_favorite(email, tuple[0].key.id())
+         #   list.append([tuple[0], tuple[1], tuple[2], tuple[3], voters, is_upvote, is_favorite])
+        #result["questions"] = list
+        result["questions"] = ["what is testing"]
+        circles = Circle.fetch_circles(email)
+        return {'questions' : questions, 'circles' :circles}
+        #path = os.path.join(os.path.dirname(__file__), '../Client/index.html')
+        #self.response.out.write(template.render(path,
+        #                          {'questions': result["questions"]
+        #                          }))
 
 class NotificationsPage(webapp2.RequestHandler):
     def post(self):

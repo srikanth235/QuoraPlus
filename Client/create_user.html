@@ -3,57 +3,100 @@
 <head>
 <meta charset="utf-8">
 <meta name="description" content="">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="keywords" content="">
 <title>Create User</title>
-<link rel="stylesheet" type="text/css" href="sourcecss.css">
-<script type="text/javascript" src="jquery.js"></script>
+<link rel="stylesheet" type="text/css" href="stylesheets/sourcecss.css">
+<script type="text/javascript" src="stylesheets/jquery.js"></script>
 <script>
-function createUser() {
-   first_name = $("#first_name").val();
-   email = $("#email").val();
-   last_name = $("#last_name").val();
-   password= $("#password").val();
-   $.post("/create_user",
-          {"email": email, "password": password, "first_name": first_name, "last_name": last_name})
-   .done(function(data) {
-          if(data === "Success")
-            window.location.href="/html/login.html";
-   })
- }
+	function createUser() {
+		validate();
+		first_name = $("#first_name").val();
+		email = $("#email").val();
+		last_name = $("#last_name").val();
+		password = $("#password").val();
+		$.post("/create_user", {
+			"email" : email,
+			"password" : password,
+			"first_name" : first_name,
+			"last_name" : last_name
+		})
+		.done(function(data) {
+			if (data === "Success")
+				window.location.href = "/html/login.html";
+		})
+	}
+	function validate() {
+		if (document.create_user_form.first_name.value == "") {
+			alert("Please provide your First Name!");
+			document.frmLogin.first_name.focus();
+			return false;
+		}
+		if (document.create_user_form.last_name.value == "") {
+			alert("Please provide your Last Name!");
+			document.frmLogin.last_name.focus();
+			return false;
+		}
+		if (document.create_user_form.email.value == "") {
+			alert("Please provide your Email!");
+			document.frmLogin.email.focus();
+			return false;
+		}
+		if (document.create_user_form.password.value == "") {
+			alert("Please provide your Password!");
+			document.frmLogin.password.focus();
+			return false;
+		}
+		if (document.create_user_form.password2.value == "") {
+			alert("Please retype your Password!");
+			document.frmLogin.password2.focus();
+			return false;
+		}
+		if (document.create_user_form.password2.value != document.create_user_form.password.value) {
+			alert("Password Mismatch!");
+			return false;
+		}
+		return (true);
+	}
 </script>
 </head>
 <body>
-	<hr />
-	<div class="titlebar">
+	<div class="titlebar" id="header-fixed">
+		<hr />
 		<input type="button" id="home" value="Quora+">
+		<hr />
 	</div>
-	<hr />
-	<table class=center>
-		<tr>
-			<td>First Name:</td>
-			<td><input type="text" id="first_name"></td>
-		</tr>
-		<tr>
-		<tr>
-			<td>Last Name:</td>
-			<td><input type="text" id="last_name"></td>
-		</tr>
+	<div class="body_content">
+		<form name="create_user_form" method="post">
+			<table class=center>
+				<tr>
+					<td>First Name:</td>
+					<td><input type="text" id="first_name"></td>
+				</tr>
+				<tr>
+				<tr>
+					<td>Last Name:</td>
+					<td><input type="text" id="last_name"></td>
+				</tr>
 
-		<td>Email:</td>
-		<td><input type="text" id="email"></td>
-		</tr>
-		<tr>
-			<td>Password:</td>
-			<td><input type="password" id="password"></td>
-		</tr>
-		<tr>
-			<td>Retype Password:</td>
-			<td><input type="password" id="password2"></td>
-		</tr>
-	</table>
-	<div id="create_circle">
-		<input type="submit" id="create_button" onclick=createUser()
-			value="Create User">
-	</div>
+				<td>Email:</td>
+				<td><input type="text" id="email"></td>
+				</tr>
+				<tr>
+					<td>Password:</td>
+					<td><input type="password" id="password"></td>
+				</tr>
+				<tr>
+					<td>Retype Password:</td>
+					<td><input type="password" id="password2"></td>
+				</tr>
+			</table>
+			<div id="create_circle">
+				<input type="submit" id="create_button" onclick=createUser()
+					value="Create User">
+			</div>
+		</form>
+		<div>
 </body>
 </html>

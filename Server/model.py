@@ -68,7 +68,7 @@ class Circle(ndb.Model):
         if key.get() is None:
             circle = Circle(key=key,
                             description=description,
-                            email = email,
+                            email=email,
                             name=name)
             circle.put()
             return True
@@ -76,10 +76,7 @@ class Circle(ndb.Model):
 
     @classmethod
     def fetch_circles(cls, email):
-        circles = []
-        qry = Circle.query(Circle.email == email).fetch(projection=[Circle.name])
-        for row in qry:
-            circles.append(qry.name)
+        circles = Circle.query(Circle.email == email).fetch()
         return circles
 
 class Question(ndb.Model):
@@ -102,23 +99,36 @@ class Question(ndb.Model):
     @classmethod
     def fetch_questions(cls, email, curs, circle, question_ids):
         allowed_emails = []
+        allowed_emails.append(email)
+        
+        # access control
         if circle is None:
-            qry = Contact.query(ndb.AND(Contact.user_email == email, circle in Contact.circles))
+            contacts_qry = Contact.query(Contact.email == email).fetch()
+            for row in qry:
+                allowed_emails.append(row.email)
         else:
-            qry = Contact.query(Contact.email == email)
-        for row in qry:
-            allowed_emails.append(row.email)
-
-        qry = Contact.query(ndb.AND(contact.emal == email, contact.user_email in allowed_emails))
+            qry = Contact.query(ndb.AND(Contact.user_email == email)).fetch()
+            for row in qry:
+                if circle in row.circles:
+                    allowed_emails.append(email)
+            
         circles = []
+        qry = Contact.query(Contact.email == email).fetch()
         for row in qry:
-            circles.append(row.circles)
-        if question_ids is None:
-            qry, next_curs, more = Question.query(ndb.AND(len(set(circles).intersection(set(Question.circles))) > 0,
-                                                          Question.email in allowed_emails)).fetch_page(20, start_cursor = curs)
-        else:
-            qry, next_curs, more = Question.query(Question.key().integer_id() in question_ids).fetch_page(20, start_cursor = curs)
-        return next_curs, more, qry.map(Answer.callback)
+            if row.user_email in allowed_emails:
+                for circle in row.circles:
+                    circles.append(circle)
+        #if question_ids is None:
+        #qry, next_curs, more = Question.query(ndb.AND(len(set(circles).intersection(set(Question.circles))) > 0)).fetch_page(20, start_cursor = curs)
+        qry = Question.query().fetch()
+        rows = []
+        for row in qry:
+            #if len(set(circles).intersection(set(row.circles))):
+                rows.append(row)  
+        #else:
+         #   qry, next_curs, more = Question.query(Question.key.id() in question_ids).fetch_page(20, start_cursor = curs)
+        return rows
+        #return next_curs, more, qry.map(Answer.callback)
         
 
 class Notification(ndb.Model):

@@ -3,31 +3,35 @@
 <head>
 <meta charset="utf-8">
 <meta name="description" content="">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="keywords" content="">
 <title>Navigation Page</title>
-<link rel="stylesheet" type="text/css" href="sourcecss.css">
+<link rel="stylesheet" type="text/css" href="stylesheets/sourcecss.css">
 </head>
 <body>
-	<hr>
-	<div class="titlebar">
+	<div class="titlebar" id="header-fixed">
+		<hr />
 		<input type="button" id="home" value="Quora+">
+		<hr />
 	</div>
-	<hr />
-	<div class="menubar">
-		<input type="button" id="content" value="Add Question" /> <input
-			type="button" id="content" value="Notifications" /> <input
-			type="button" id="content" value="Favorites" /> <input type="button"
-			id="content" value="More" /> <select name="circle_select">
-			<option value="All Circles">All Circles</option>
-			<option value="Family">Family</option>
-			<option value="Friends">Friends</option>
-		</select>
-	</div>
-	<hr />
-	<hr />
-	<div id="more" align="center">
-		<input type="button" id="down_button" value="Modify Contacts">
-		<input type="button" id="down_button" value="Unanswered Questions">
+	<div class="body_content">
+		<div class="menubar">
+			<input type="button" id="content" value="Add Question" /> <input
+				type="button" id="content" value="Notifications" /> <input
+				type="button" id="content" value="More" /> <select
+				name="circle_select">
+				<option value="All Circles">All Circles</option>
+				<option value="Family">Family</option>
+				<option value="Friends">Friends</option>
+			</select>
+		</div>
+		<hr />
+		<hr />
+		<div id="more" align="center">
+			<input type="button" id="down_button" value="Modify Contacts">
+			<input type="button" id="down_button" value="Q's Unanswered">
+		</div>
 	</div>
 </body>
 </html>

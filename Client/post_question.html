@@ -3,10 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="description" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="keywords" content="">
 <title>Create Post</title>
-<link rel="stylesheet" type="text/css" href="sourcecss.css">
-<script type="text/javascript" src="jquery.js"></script>
+<link rel="stylesheet" type="text/css" href="stylesheets/sourcecss.css">
+ <script type="text/javascript" src="stylesheets/jquery.js"></script>
 <script>
 function createQuestion() {
    circles = $("#circles").val();
@@ -17,11 +18,12 @@ function createQuestion() {
 </script>
 </head>
 <body>
-	<hr />
-	<div class="titlebar">
+	<div class="titlebar" id="header-fixed">
+	<hr/>
 		<input type="button" id="home" value="Quora+">
+		<hr />
 	</div>
-	<hr />
+	<div class="body_content">
 	<form name="myContact" method="post">
 		<table class=center>
 			<tr>
@@ -38,9 +40,9 @@ function createQuestion() {
 			</tr>
 		</table>
 		<div id="create_circle">
-			<input type="submit" id="create_button" onclick=createQuestion()
-				value="Post Question">
+			<input type="submit" id="create_button" onclick = createQuestion() value="Post Question">
 		</div>
 	</form>
+	</div>
 </body>
 </html>

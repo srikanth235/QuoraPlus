@@ -3,37 +3,40 @@
 <head>
 <meta charset="utf-8">
 <meta name="description" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="keywords" content="">
 <title>View Contacts</title>
-<link rel="stylesheet" type="text/css" href="sourcecss.css">
+<link rel="stylesheet" type="text/css" href="stylesheets/sourcecss.css">
 </head>
 <body>
-	<hr>
-	<div class="titlebar">
+	<div class="titlebar" id="header-fixed">
+		<hr />
 		<input type="button" id="home" value="Quora+">
-	</div>
-	<hr />
-	<div class="view_contacts">
-		<div id="question_content">
-			<strong>Srikanth</strong> <input type="button" id="circles"
-				value="Geeks">
-		</div>
 		<hr />
-		<div id="view_contacts">
-			<strong>Ashish</strong> <input type="button" id="circles"
-				value="Friends">
-		</div>
-		<hr />
-		<div id="view_contacts">
-			<strong>Deepak</strong> <input type="button" id="circles"
-				value="UIUC"> <input type="button" id="circles"
-				value="Friends"> <input type="button" id="circles"
-				value="College">
-		</div>
 	</div>
-	<hr />
-	<div id="more" align="center">
-		<input type="button" id="down_button" value="Create Contact">
+	<div class="body_content">
+		<div class="view_contacts">
+			<div id="question_content">
+				<strong>Srikanth</strong> <input type="button" class="circles"
+					value="Geeks">
+				<hr />
+			</div>
+			<div class="view_contacts">
+				<strong>Ashish</strong> <input type="button" class="circles"
+					value="Friends">
+				<hr />
+			</div>
+			<div class="view_contacts">
+				<strong>Deepak</strong> <input type="button" class="circles"
+					value="UIUC"> <input type="button" class="circles"
+					value="Friends"> <input type="button" class="circles"
+					value="College">
+			</div>
+			<hr />
+		</div>
+		<div id="more" align="center">
+			<input type="button" id="down_button" value="Create Contact">
+		</div>
 	</div>
 </body>
 </html>
