@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="">
+<meta name="keywords" content="">
+<title>Create Contact</title>
+<link rel="stylesheet" type="text/css" href="sourcecss.css">
+ <script type="text/javascript" src="jquery.js"></script>
+ <script>function createContact() {
+	   name = $("#name").val();
+	   email = $("#email").val();
+	   circles = $("#circles").val();
+	   $.post("/create_contact",
+	          {"name": name, "circles": circles, "email": email})
+	   .done(function(data) {
+	        window.location.href = "/ViewContacts.html";//???
+	   })
+	   .fail(function() {
+	        $("body").html("Try Again!");
+	   })
+	}</script>
+</head>
+<body>
+	<hr />
+	<div class="titlebar">
+		<input type="button" id="home" value="Quora+">
+	</div>
+	<hr />
+	<form name="myContact" onsubmit="return validateFormCreateContact()"
+		method="post">
+		<table class=center>
+			<tr>
+				<td>Name:</td>
+				<td><input type="text" id="name"></td>
+			</tr>
+			<tr>
+				<td>Email:</td>
+				<td><input type="text" id="email"></td>
+			</tr>
+			<tr>
+				<td>Circles:</td>
+				<td><select name="circle_select" id="circles">
+						<option value="All Circles">All Circles</option>
+						<option value="Family">Family</option>
+						<option value="Friends">Friends</option>
+				</select></td>
+			</tr>
+		</table>
+		<div id="create_circle">
+			<input type="submit" id="create_button" onclick = createContact() value="Create Contact">
+		</div>
+	</form>
+</body>
+</html>
