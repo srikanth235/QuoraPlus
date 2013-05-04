@@ -55,12 +55,6 @@ body {
 	height: 20px;
 }
 
-#Circles {
-	position: absolute;
-	right: 0px;
-	width: 30px;
-}
-
 #favorite_image {
 	height: 25px;
 	width: 25px;
@@ -72,36 +66,28 @@ body {
 	height: 20px;
 	width: 25px;
 	font-size: 12px;
+	background-color: white;
 }
 
-#more {
+.more {
 	width: 250px;
 	margin-left: auto;
 	margin-right: auto;
 }
 
-#create_circle {
+.createDiv {
 	width: 100px;
 	margin-left: auto;
 	margin-right: auto;
 }
-
-#create_button {
-	width: 250px;
+.createButton {
+	width: 150px;
 	height: 30px;
 }
 
-#down_button {
+.down_button {
 	width: 250px;
 	height: 30px;
-}
-
-#circles {
-	margin: 0px, 0px, 0px, 0px;
-	background-color: #FFFFFF;
-	border-color: green;
-	float: right;
-	margin-left: 6px;
 }
 
 #content_main_table {

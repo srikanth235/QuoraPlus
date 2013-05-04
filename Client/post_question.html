@@ -3,53 +3,40 @@
 <head>
 <meta charset="utf-8">
 <meta name="description" content="">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="keywords" content="">
 <title>Create Post</title>
 <link rel="stylesheet" type="text/css" href="stylesheets/sourcecss.css">
- <script type="text/javascript" src="stylesheets/jquery.js"></script>
+<script type="text/javascript" src="stylesheets/jquery.js"></script>
+<script type="text/javascript" src="stylesheets/javasource.js"></script>
 </head>
 <body>
 	<div class="titlebar" id="header-fixed">
-	<hr/>
-		<input type="button" id="home" value="Quora+">
+		<hr />
+		<input type="button" id="home"
+			onclick="window.location.href = '/html/index.html';" value="Quora+">
 		<hr />
 	</div>
 	<div class="body_content">
-		<table class=center>
-			<tr>
-				<td>Circles:</td>
-				<td><select name="circle_select" id="circles">
-						<option value="All Circles">All Circles</option>
-						<option value="Family">Family</option>
-						<option value="Friends">Friends</option>
-				</select></td>
-			</tr>
-			<tr>
-				<td>Description:</td>
-				<td><textarea rows="4" cols="20" id="description"></textarea></td>
-			</tr>
-		</table>
-		<div id="create_circle">
-			<input type="submit" id="create_button" value="Post Question">
-		</div>
+			<table class=center>
+				<tr>
+					<td>Circles:</td>
+					<td><select name="circle_select" id="circles">
+							<option value="All Circles">All Circles</option>
+							<option value="Family">Family</option>
+							<option value="Friends">Friends</option>
+					</select></td>
+				</tr>
+				<tr>
+					<td>Description:</td>
+					<td><textarea rows="4" cols="20" id="description"></textarea></td>
+				</tr>
+			</table>
+			<div class="createDiv">
+				<input type="submit" class="createButton" onclick=createQuestion()
+					value="Post Question">
+			</div>
 	</div>
 </body>
-<script>
-$("#create_button").click( function() {
-      circles = $("#circles").val()
-      description = $("#description").val();
-      $.post("/create_question",
-          {"circles": JSON.stringify([circles]), "description": description})
-      .done(function(data) {
-          window.location.href = "/main"
-      })
-      .fail(function(data) {
-          alert("fail");
-      })
-   })
-   $("#home").click(function() {
-		window.location.href = "/main";
-	});
-</script>
 </html>

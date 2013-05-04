@@ -8,18 +8,20 @@
 <meta name="keywords" content="">
 <title>Navigation Page</title>
 <link rel="stylesheet" type="text/css" href="stylesheets/sourcecss.css">
+<script type="text/javascript" src="stylesheets/javasource.js"></script>
 </head>
 <body>
 	<div class="titlebar" id="header-fixed">
 		<hr />
-		<input type="button" id="home" value="Quora+">
+		<input type="button" id="home"
+			onclick="window.location.href = '/html/index.html';" value="Quora+">
 		<hr />
 	</div>
 	<div class="body_content">
 		<div class="menubar">
-			<input type="button" id="content" value="Add Question" /> <input
-				type="button" id="content" value="Notifications" /> <input
-				type="button" id="content" value="More" /> <select
+			<input type="button" id="content" value="Add Question" onclick="window.location.href = '/html/post_question.html';"/> <input
+				type="button" id="content" value="Notifications" onclick="window.location.href = '/html/NotificationsPage.html';" /> <input
+				type="button" id="content" value="More" onclick="window.location.href = '/html/NavigationPage.html';"/> <select
 				name="circle_select">
 				<option value="All Circles">All Circles</option>
 				<option value="Family">Family</option>
@@ -28,9 +30,9 @@
 		</div>
 		<hr />
 		<hr />
-		<div id="more" align="center">
-			<input type="button" id="down_button" value="Modify Contacts">
-			<input type="button" id="down_button" value="Q's Unanswered">
+		<div class="more" align="center">
+			<input type="button" class="down_button" value="Modify Contacts">
+			<input type="button" class="down_button" value="Q's Unanswered">
 		</div>
 	</div>
 </body>

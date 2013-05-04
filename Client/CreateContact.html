@@ -9,77 +9,38 @@
 <title>Create Contact</title>
 <link rel="stylesheet" type="text/css" href="stylesheets/sourcecss.css">
 <script type="text/javascript" src="stylesheets/jquery.js"></script>
-<script>
-	function createContact() {
-		validate();
-		name = $("#name").val();
-		email = $("#email").val();
-		circles = $("#circles").val();
-		$.post("/create_contact", {
-			"name" : name,
-			"circles" : JSON.stringify([ circles ]),
-			"email" : email,
-			"user_email" : localStorage.getItem("email")
-		}).done(function(data) {
-			alert(data)
-			window.location.href = "/html/ViewContacts.html";
-		}).fail(function() {
-			alert("fail")
-			$("body").html("Try Again!");
-		})
-	}
-	function validate() {
-		if (document.create_contact_form.name.value == "") {
-			alert("Please provide a Contact Name!");
-			document.frmLogin.name.focus();
-			return false;
-		}
-		if (document.create_contact_form.email.value == "") {
-			alert("Please provide the email!");
-			document.frmLogin.email.focus();
-			return false;
-		}
-
-		return (true);
-	}
-</script>
+<script type="text/javascript" src="stylesheets/javasource.js"></script>
 </head>
 <body>
 	<div class="titlebar" id="header-fixed">
 		<hr />
-		<input type="button" id="home" value="Quora+">
+		<input type="button" id="home"
+			onclick="window.location.href = '/html/index.html';" value="Quora+">
 		<hr />
 	</div>
 	<div class="body_content">
-		<form name="create_contact_form" method="post">
-			<table class=center>
-		<tr>
-			<td>Name:</td>
-			<td><input type="text" id="name"></td>
-		</tr>
-		<tr>
-			<td>Email:</td>
-			<td><input type="text" id="email"></td>
-		</tr>
-		<tr>
-			<td>Circles:</td>
-			<td><select name="circle_select" id="circles">
-					<option value="All Circles">All Circles</option>
-					<option value="Family">Family</option>
-					<option value="Friends">Friends</option>
-			</select></td>
-		</tr>
-	</table>
-	<div id="create_circle">
-		<input type="submit" id="create_button" onclick=createContact()
-			value="Create Contact">
-	</div>
-		</form>
+		<table class=center>
+			<tr>
+				<td>Name:</td>
+				<td><input type="text" id="name"></td>
+			</tr>
+			<tr>
+				<td>Email:</td>
+				<td><input type="text" id="email"></td>
+			</tr>
+			<tr>
+				<td>Circles:</td>
+				<td><select name="circle_select" id="circles" multiple>
+						<option value="All Circles">All Circles</option>
+						<option value="Family">Family</option>
+						<option value="Friends">Friends</option>
+				</select></td>
+			</tr>
+		</table>
+		<div class="createDiv">
+			<input type="submit" class="createButton" onclick=createContact()
+				value="Create Contact">
+		</div>
 	</div>
 </body>
-<script>
-	$("#home").click(function() {
-		window.location.href = "/html/index.html";
-	});
-</script>
 </html>

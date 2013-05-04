@@ -9,62 +9,29 @@
 <title>Create Circle</title>
 <link rel="stylesheet" type="text/css" href="stylesheets/sourcecss.css">
 <script type="text/javascript" src="stylesheets/jquery.js"></script>
-<script>
-	function createCircle() {
-		validate();
-		name = $("#name").val();
-		description = $("#description").val();
-		email = localStorage.getItem("email");
-		$.post("/create_circle", {
-			"name" : name + "_" + email,
-			"email" : email,
-			"description" : description
-		}).done(function(data) {
-			alert(data);
-			window.location.href = "/html/index.html";
-		}).fail(function() {
-			$("body").html("Try Again!");
-		})
-	}
-	function validate() {
-		if (document.create_circle_form.name.value == "") {
-			alert("Please provide a Circle Name!");
-			document.frmLogin.name.focus();
-			return false;
-		}
-
-		return (true);
-	}
-</script>
+<script type="text/javascript" src="stylesheets/javasource.js"></script>
 </head>
 <body>
-
 	<div class="titlebar" id="header-fixed">
 		<hr />
-		<input type="button" id="home" value="Quora+">
+		<input type="button" id="home"
+			onclick="window.location.href = '/html/index.html';" value="Quora+">
 		<hr />
 	</div>
 	<div class="body_content">
-		<form name="create_circle_form" method="post">
-			<table class=center>
-				<tr>
-					<td>Circle Name:</td>
-					<td><input type="text" id="name"></td>
-				</tr>
-				<tr>
-					<td>Circle Description:</td>
-					<td><textarea rows="4" cols="20" id="description"></textarea></td>
-				</tr>
-			</table>
-			<div id="create_circle">
-				<input type="submit" id="create_button" onclick=createCircle()
-					value="Create Circle">
-			</div>
+		<table class=center>
+			<tr>
+				<td>Circle Name:</td>
+				<td><input type="text" id="name"></td>
+			</tr>
+			<tr>
+				<td>Circle Description:</td>
+				<td><textarea rows="4" cols="20" id="description"></textarea></td>
+			</tr>
+		</table>
+		<div class="createDiv">
+			<input type="submit" class="createButton" onclick=createCircle()
+				value="Create Circle">
+		</div>
 </body>
-
-<script>
-	$("#home").click(function() {
-		window.location.href = "/html/index.html";
-	});
-</script>
 </html>

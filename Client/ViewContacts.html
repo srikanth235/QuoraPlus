@@ -3,39 +3,28 @@
 <head>
 <meta charset="utf-8">
 <meta name="description" content="">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="keywords" content="">
 <title>View Contacts</title>
 <link rel="stylesheet" type="text/css" href="stylesheets/sourcecss.css">
+<script type="text/javascript" src="stylesheets/javasource.js"></script>
 </head>
 <body>
 	<div class="titlebar" id="header-fixed">
 		<hr />
-		<input type="button" id="home" value="Quora+">
+		<input type="button" id="home"
+			onclick="window.location.href = '/html/index.html';" value="Quora+">
 		<hr />
 	</div>
 	<div class="body_content">
 		<div class="view_contacts">
-			<div id="question_content">
-				<strong>Srikanth</strong> <input type="button" class="circles"
-					value="Geeks">
-				<hr />
-			</div>
-			<div class="view_contacts">
-				<strong>Ashish</strong> <input type="button" class="circles"
-					value="Friends">
-				<hr />
-			</div>
-			<div class="view_contacts">
-				<strong>Deepak</strong> <input type="button" class="circles"
-					value="UIUC"> <input type="button" class="circles"
-					value="Friends"> <input type="button" class="circles"
-					value="College">
-			</div>
+			<strong>Srikanth</strong> <input type="button" class="circles"
+				value="Geeks">
 			<hr />
 		</div>
-		<div id="more" align="center">
-			<input type="button" id="down_button" value="Create Contact">
+		<div class="more" align="center">
+			<input type="button" class="down_button" value="Create Contact">
 		</div>
 	</div>
 </body>

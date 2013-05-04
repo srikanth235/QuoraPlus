@@ -9,38 +9,26 @@
 <title>Post Answer</title>
 <link rel="stylesheet" type="text/css" href="stylesheets/sourcecss.css">
 <script type="text/javascript" src="stylesheets/jquery.js"></script>
-<script>
-	function postAnswer() {
-		description = $("#description").val();
-		$.post("/post_question",
-		       {"user_id":localstorage.getItem(email), 
-		       "description": description , "name":localstorage.getItem(name)})
-	}
-	alert("here" + $.url.param("question_id"));
-</script>
+<script type="text/javascript" src="stylesheets/javasource.js"></script>
 </head>
 <body>
 
 	<div class="titlebar" id="header-fixed">
 		<hr />
-		<input type="button" id="home" value="Quora+">
+		<input type="button" id="home"
+			onclick="window.location.href = '/html/index.html';" value="Quora+">
 		<hr />
 	</div>
 	<div class="body_content">
-			<table class=center>
-				<tr>
-					<td>Your Answer:</td>
-					<td><textarea rows="4" cols="20" id="description"></textarea></td>
-				</tr>
-			</table>
-			<div id="create_circle">
-				<input type="submit" id="create_button" onclick=postAnswer()
-					value="Post Answer">
-			</div>
+		<table class=center>
+			<tr>
+				<td>Your Answer:</td>
+				<td><textarea rows="4" cols="20" id="description"></textarea></td>
+			</tr>
+		</table>
+		<div class="createDiv">
+			<input type="submit" class="createButton" onclick=postAnswer()
+				value="Post Answer">
+		</div>
 </body>
-<script>
-    $("#home").click(function() {
-		window.location.href = "/main";
-	});
-</script>
 </html>
