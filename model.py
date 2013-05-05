@@ -23,6 +23,7 @@ class User(ndb.Model):
     date_created = ndb.DateTimeProperty(indexed=False, auto_now=True)
     first_name = ndb.StringProperty(indexed=False)
     last_name = ndb.StringProperty(indexed=False)
+    screen_name = ndb.StringProperty(indexed=False)
 
     @classmethod 
     @ndb.transactional(retries=1)
@@ -33,9 +34,17 @@ class User(ndb.Model):
                         email=email,
                         password=password,
                         first_name=first_name,
-                        last_name=last_name)
+                        last_name=last_name,
+                        screen_name=first_name + " " + last_name)
             user.put()
             return user, True
+        return None, False
+    
+    @classmethod 
+    @ndb.transactional(retries=1)
+    def delete_user(cls, email):
+        key = ndb.Key(User, email)
+        key.delete()
         return None, False
 
     @classmethod
@@ -43,10 +52,10 @@ class User(ndb.Model):
         key = ndb.Key(User, email)
         user = key.get()
         if user is None:
-            return False
-        #elif password == user.password:
-            return True
-        return False
+            return None, False
+        elif password == user.password:
+            return user, True
+        return None, False
     
     @classmethod
     def get_user(cls, email):
@@ -56,7 +65,7 @@ class User(ndb.Model):
 
 class Circle(ndb.Model):
     """Models circles on  Quora+"""
-    date_created = ndb.DateProperty(indexed=False, auto_now_add=True)
+    date_created = ndb.DateTimeProperty(indexed=False, auto_now_add=True)
     description = ndb.StringProperty(indexed=False)
     name = ndb.StringProperty(indexed=True)
     email = ndb.StringProperty(indexed=True)
@@ -81,10 +90,11 @@ class Circle(ndb.Model):
 
 class Question(ndb.Model):
     """Models an individual Question on  Quora+"""
-    date_created = ndb.DateProperty(indexed=True, auto_now=True)
+    date_created = ndb.DateTimeProperty(indexed=True, auto_now=True)
     description = ndb.TextProperty(indexed=True)
     circles = ndb.StringProperty(repeated=True)
     email = ndb.StringProperty(indexed=True)
+    access_structure = ndb.StringProperty(indexed=True)
 
     @classmethod 
     @ndb.transactional(retries=1)
@@ -100,24 +110,6 @@ class Question(ndb.Model):
     def fetch_questions(cls, email, curs, circle, question_ids):
         allowed_emails = []
         allowed_emails.append(email)
-        
-        # access control
-        if circle is None:
-            contacts_qry = Contact.query(Contact.email == email).fetch()
-            for row in qry:
-                allowed_emails.append(row.email)
-        else:
-            qry = Contact.query(ndb.AND(Contact.user_email == email)).fetch()
-            for row in qry:
-                if circle in row.circles:
-                    allowed_emails.append(email)
-            
-        circles = []
-        qry = Contact.query(Contact.email == email).fetch()
-        for row in qry:
-            if row.user_email in allowed_emails:
-                for circle in row.circles:
-                    circles.append(circle)
         #if question_ids is None:
         #qry, next_curs, more = Question.query(ndb.AND(len(set(circles).intersection(set(Question.circles))) > 0)).fetch_page(20, start_cursor = curs)
         qry = Question.query().fetch()
@@ -133,7 +125,7 @@ class Question(ndb.Model):
 
 class Notification(ndb.Model):
     """Models user notification on  Quora+"""
-    date_created = ndb.DateProperty(indexed=True, auto_now_add=True)
+    date_created = ndb.DateTimeProperty(indexed=True, auto_now=True)
     data = ndb.StringProperty(indexed=False, repeated=True)
     is_read = ndb.BooleanProperty(default=False, indexed=True)
     email = ndb.StringProperty(indexed=True)
@@ -150,12 +142,8 @@ class Notification(ndb.Model):
 
     @classmethod 
     @ndb.transactional(retries=1)
-    def mark_as_read(cls, email, identifier=None):
-        if identifier is None:
-            notifications = Notification.query(ndb.AND(Notification.email==email, Notification.is_read==False))
-        else:
-            key = ndb.Key(Notification, identifier)
-            notifications = [key.get()]
+    def mark_as_read(cls, email, identifiers):
+        notitifications = ndb.get_multi(identifiers)
         for notification in notifications:
             notification.is_read = True
             notification.put()
@@ -173,7 +161,7 @@ class Notification(ndb.Model):
 class Answer(Question):
     """Models answer on Quora+"""
     description = ndb.StringProperty(indexed=False)
-    date_created = ndb.DateProperty(auto_now_add=True)
+    date_created = ndb.DateTimeProperty(auto_now_add=True)
     email = ndb.StringProperty(indexed=True)
     upvote_count = ndb.IntegerProperty(default=0, indexed=True)
     question_id = ndb.IntegerProperty(indexed=True)
@@ -277,3 +265,6 @@ class Contact(User):
             contact.put()
             return True
         return False
+    @classmethod
+    def fetch_contacts(cls, email):
+        return Contact.query(Contact.user_email == email).fetch()

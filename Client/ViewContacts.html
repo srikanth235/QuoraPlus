@@ -8,7 +8,14 @@
 <meta name="keywords" content="">
 <title>View Contacts</title>
 <link rel="stylesheet" type="text/css" href="stylesheets/sourcecss.css">
+<script type="text/javascript" src="stylesheets/jquery.js"></script>
 <script type="text/javascript" src="stylesheets/javasource.js"></script>
+<script>
+$.post("/view_contacts", {"email": localStorage.getItem("email")})
+.done(function(data) {
+   alert(data)
+})
+</script>
 </head>
 <body>
 	<div class="titlebar" id="header-fixed">
@@ -24,7 +31,7 @@
 			<hr />
 		</div>
 		<div class="more" align="center">
-			<input type="button" class="down_button" value="Create Contact">
+			<input type="button" class="down_button" value="Create Contact" onclick="displayCreateContact()">
 		</div>
 	</div>
 </body>

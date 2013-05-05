@@ -15,7 +15,6 @@ import json
 import os
 import random
 import webapp2
-import json
 
 from jinja2 import Environment, FunctionLoader, MemcachedBytecodeCache
 
@@ -32,10 +31,6 @@ from helpers import template_handler, json_handler
 
 from model import *
 
-class Main(webapp2.RequestHandler):
-    def get(self):
-          self.redirect("/html/index.html")
-
 class CreateUser(webapp2.RequestHandler):
     def post(self):
           user, result = User.create_user(
@@ -43,6 +38,15 @@ class CreateUser(webapp2.RequestHandler):
                             password=self.request.get("password"),
                             first_name=self.request.get("first_name"),
                             last_name=self.request.get("last_name"))
+          if result:
+              self.response.out.write("Success")
+          else:
+              self.response.out.write("Failure")
+
+class DeleteUser(webapp2.RequestHandler):
+    def post(self):
+          user, result = User.delet_user(
+                            email=self.request.get("email"))
           if result:
               self.response.out.write("Success")
           else:
@@ -86,7 +90,7 @@ class CreateAnswer(webapp2.RequestHandler):
         key = ndb.Key(Question, question_id)
         email = key.get().email
         Notification.create_notification(email=email,
-                                         data=[self.request.get("email"), self.request.get("name")], 
+                                         data=[self.request.get("email"), self.request.get("name")],
                                          creator_email=self.request.get("email"),
                                          type=2)
         if result:
@@ -108,7 +112,7 @@ class CreateContact(webapp2.RequestHandler):
                                      Contact.user_email == self.request.get("user_email"))).fetch()
         if len(qry) > 0:
             data = qry[0].circles
-        result = Notification.create_notification(email=self.request.get("email"), 
+        result = Notification.create_notification(email=self.request.get("email"),
                                          creator_email=self.request.get("user_email"),
                                          type=1,
                                          data=circles)
@@ -116,7 +120,15 @@ class CreateContact(webapp2.RequestHandler):
             self.response.out.write("Success")
         else:
             self.response.out.write("Failure")
-            
+
+class ViewContacts(webapp2.RequestHandler):
+    def post(self):
+        contacts = Contact.fetch_contacts(self.request.get("email"))
+        result = []
+        for contact in contacts:
+            result.append([contact.email, contact.circles])
+        self.response.out.write(result)
+         
 class MarkVote(webapp2.RequestHandler):
     def get(self):
         answer_id = int(self.request.get("answer_id"))
@@ -145,52 +157,20 @@ class MarkFavorite(webapp2.RequestHandler):
     
 class Login(webapp2.RequestHandler):
     def post(self):
-        if User.is_valid_user(self.request.get("email"),
-                              self.request.get("password")):
-            self.response.out.write("Success")
+        user, result = User.is_valid_user(self.request.get("email"),
+                              self.request.get("password"))
+        if result:
+            self.response.out.write(
+                json.dumps({"screen_name": user.screen_name,
+                            "email": user.email}))
         else:
             self.response.out.write("Failure")
 
 class MainPage(webapp2.RequestHandler):
-    @template_handler('index.html')
     def get(self):
-        result = {}
-        email = self.request.get("email")
-        curs = Cursor(urlsafe=self.request.get("cursor"))
-        circle = self.request.get("circle_name")
-        question_list = []
-        if self.request.get("want_favorites"):
-            qry = Favorite.query(email==email).fetch()
-            for row in qry:
-                question_list.append(row.key().integer_id())
-        if self.request.get("question_id"):
-            question_list.append(int(self.request.get("question_id")))
-        questions = Question.fetch_questions(email, curs, circle, question_list)
-       # result["next_curs"] = next_curs
-       # result["more"] = more
-       # list = []
-        
-        #for tuple in questions:
-            #question, top answer, # of answers, voters
-         #   is_upvote = False
-         #   voters = []
-         #   for voter in tuple[3]:
-         #       voters.append(voter.name)
-         #       if email == voter.email:
-         #           is_upvote = True
-         #   is_favorite = Favorite.is_favorite(email, tuple[0].key.id())
-         #   list.append([tuple[0], tuple[1], tuple[2], tuple[3], voters, is_upvote, is_favorite])
-        #result["questions"] = list
-        result["questions"] = ["what is testing"]
-        circles = Circle.fetch_circles(email)
-        pairs = []
-        for question in questions:
-            pairs.append([question, Answer.fetch_answer(question.key.id())])
-        return {'questions' : pairs, 'circles' :circles}
-        #path = os.path.join(os.path.dirname(__file__), '../Client/index.html')
-        #self.response.out.write(template.render(path,
-        #                          {'questions': result["questions"]
-        #                          }))
+        if self.request.get("auth") != "1":
+            self.redirect("/html/login.html")
+        self.redirect("/html/index.html")
 
 class NotificationsPage(webapp2.RequestHandler):
     def post(self):
@@ -203,6 +183,15 @@ class NotificationsPage(webapp2.RequestHandler):
             result["next_curs"] = next_curs.url_safe()
         result["more"] = more
         self.response.out.write(json.dumps(result))
+
+class ViewNotificationsPage(webapp2.RequestHandler):
+    def post(self):
+        email = self.request.get("email")
+        notifications, next_curs, more = Notification.fetch_unread_notifications(email)
+        results = []
+        for notification in notifications:
+            results.append([notification.email, notification.user_email, notification.data])
+        self.response.out.write(results)
 
 class ClearNotificationsPage(webapp2.RequestHandler):
     def post(self):
@@ -217,7 +206,7 @@ class FavoritePage(webapp2.RequestHandler):
 url_routes = []
 url_routes.append(
     routes.RedirectRoute(r'/',
-                         handler=Main,
+                         handler=MainPage,
                          strict_slash=True,
                          name="main")
 )
@@ -258,6 +247,13 @@ url_routes.append(
                          strict_slash=True,
                          name="create_contact")
 )
+
+url_routes.append(
+    routes.RedirectRoute(r'/view_contacts',
+                         handler=ViewContacts,
+                         strict_slash=True,
+                         name="view_contact")
+)
  
 url_routes.append(
     routes.RedirectRoute(r'/vote',
@@ -281,19 +277,18 @@ url_routes.append(
 )
 
 url_routes.append(
-    routes.RedirectRoute(r'/main',
-                         handler=MainPage,
-                         strict_slash=True,
-                         name="main")
-)
-
-url_routes.append(
     routes.RedirectRoute(r'/notifications',
                          handler=NotificationsPage,
                          strict_slash=True,
                          name="notifications")
 )
 
+url_routes.append(
+    routes.RedirectRoute(r'/view_notifications',
+                         handler=ViewNotificationsPage,
+                         strict_slash=True,
+                         name="view_notifications")
+)
 # 
 # url_routes.append(
 #     routes.RedirectRoute(r'/<user_id:\d+>/view_contacts',

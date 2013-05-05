@@ -20,13 +20,10 @@
 	</div>
 	<div class="body_content">
 		<div class="menubar">
-			<input type="button" id="content" value="Add Question"
-				onclick="window.location.href = '/html/post_question.html';" /> <input
-				type="button" id="content" value="Notifications"
-				onclick="window.location.href = '/html/NotificationsPage.html';" />
-			<input type="button" id="content" value="More"
-				onclick="window.location.href = '/html/NavigationPage.html';" /> <select
-				name="circle_select">
+			<input type="button" id="content" value="Add Question" onclick = "displayPostQuestion()"/> 
+			<input type="button" id="content" value="Notifications" onclick = "displayNotifications()"/> 
+			<input type="button" id="content" value="More" onclick = "displayMoreNavigation()"/>  
+			<select name="circle_select">
 				<option value="All Circles">All Circles</option>
 				<option value="Family">Family</option>
 				<option value="Friends">Friends</option>
