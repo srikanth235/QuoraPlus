@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="keywords" content="">
+<title>Main Page</title>
+<link rel="stylesheet" type="text/css" href="/html/stylesheets/sourcecss.css">
+<script type="text/javascript" src="/html/stylesheets/jquery.js"></script>
+<script type="text/javascript" src="/html/stylesheets/javasource.js">
+</head>
+<body>
+	<div class="titlebar" id="header-fixed">
+		<hr />
+		<input type="button" id="home" value="Quora+">
+		<hr />
+	</div>
+	<div class="body_content">
+		<div class="menubar">
+			<input type="button" id="content" class="add_question"
+				value="Add Question" /> <input type="button" id="content" class = "notifications"
+				value="Notifications" /> <input type="button" id="content" class = "navigations"
+				value="More" /> <select name="circle_select">
+				<option value="All Circles">All Circles</option>
+				<option value="Family">Family</option>
+			</select>
+		</div>
+		<hr />
+		<table id="content_main_table">
+			{% for question in questions %}
+			<tr>
+			<td>
+                <div id="toggler1">
+                    <img src="favorite_blank.jpg" height="25px" width="25px"
+                        float="left" /> <img src="favorite_voted.jpg"
+                        height="25px" width="25px" float="left"
+                        style="display: none" />
+                </div></td>
+                <div class="questions">
+							<div id="question_content">
+								<td id = {{question[0].key.id()}}>
+								<strong> {{question[0].description}}  <br /></td>
+			</tr>
+			<tr>
+				<td><input type="button" id="vote_count" value="1"></td>
+				</strong>
+				<td>Srikanth, Graduate Student</td>
+			</tr>
+			<tr>
+				<td />
+				{% if question[1] %}
+				<td id = {{question[1].key.id()}}>{{question[1].description}}</td>
+				{% endif%}
+			</tr>
+			<tr>
+				<td />
+				<td><a href="#">Upvote</a> <a href="#">Downvote</a> <!-- how to give on click function --> 
+				</td>
+			</tr>
+			</div>
+			<tr>
+				<td colspan="9"><hr size="3" width="100%" /></td>
+			</tr>
+			{% endfor %}
+		</table>
+	</div>
+	<div id="more" align="center">
+		<input type="button" id="more_button" value="More">
+	</div>
+	</div>
+</body>
+<script>
+	$(".add_question").click(function() {
+		window.location.href = "/html/post_question.html";
+	});
+
+	$(".notifications").click(function() {
+		window.location.href = "/html/NotificationsPage.html";
+	});
+
+	$(".more").click(function() {
+		window.location.href = "/html/NavigationPage.html";
+	});
+
+	$("#home").click(function() {
+		window.location.href = "/main";
+	});
+</script>
+</html>
