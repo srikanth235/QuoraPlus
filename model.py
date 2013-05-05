@@ -73,7 +73,7 @@ class Circle(ndb.Model):
     @classmethod 
     @ndb.transactional(retries=1)
     def create_circle(cls, name, email, description):
-        key = ndb.Key(Circle, name)
+        key = ndb.Key(Circle, name + " " + email)
         if key.get() is None:
             circle = Circle(key=key,
                             description=description,
@@ -238,7 +238,10 @@ class Favorite(ndb.Model):
         else:
             favorite = key.get()
             if question_id in favorite.question_ids:
-                favorite.question_ids.remove(question_id)
+                if len(favorite.question_ids) == 1:
+                    favorite.question_ids = [-1]
+                else:
+                    favorite.question_ids.remove(question_id)
             else:
                 favorite.questions_ids.append(question_id)
             favorite.put()

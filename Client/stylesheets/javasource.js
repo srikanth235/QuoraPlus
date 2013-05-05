@@ -31,14 +31,14 @@ function createCircle() {
 	var description = $("#description").val();
 	var email = localStorage.getItem("email");
 	$.post("/create_circle", {
-		"name" : name + "_" + email,
+		"name" : name,
 		"email" : email,
 		"description" : description
 	}).done(function(data) {
 		alert(data);
 		window.location.href = "/html/index.html";
 	}).fail(function() {
-		$("body").html("Try Again!");
+		$("body").html("<h1>Try Again!</h1>");
 	})
 }
 
@@ -107,17 +107,24 @@ function displayCreateContact() {
 	window.location.href = '/html/CreateContact.html';
 }
 
-$(document).ready(function() {
+function addFavoriteEventListener() {
 	$("#favorite").click(function() {
 		$(this).find('img').toggle();
 	});
+}
+
+function addVoteEventListener() {
 	$('#upvote_link').click( function(event) {
-	    
 		var link_content = document.getElementById("u1");
 		if(link_content.innerHTML === 'Undo')
 			link_content.innerHTML='UpVote';
 		else
 			link_content.innerHTML='Undo';			
 	});
+}
+
+$(document).ready(function() {
+    addFavoriteEventListener();
+    addVoteEventListener();
 });
 
