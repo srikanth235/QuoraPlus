@@ -10,6 +10,27 @@
 <link rel="stylesheet" type="text/css" href="stylesheets/sourcecss.css">
 <script type="text/javascript" src="stylesheets/jquery.js"></script>
 <script type="text/javascript" src="stylesheets/javasource.js"></script>
+<script>
+	var checked = {};
+	$(':input[type=checkbox]').each(function() {
+		var name = this.name;
+		var val = this.checked;
+		if (val) {
+			checked[name] = val;
+		}
+		console.dir(checked);
+	}).on('change', function() {
+		var name = this.name;
+		var val = this.checked;
+		if (val) {
+			checked[name] = val;
+		} else {
+			delete checked[name];
+		}
+		console.dir(checked);
+		alert(checked);
+	});
+</script>
 </head>
 <body>
 	<div class="titlebar" id="header-fixed">
@@ -30,15 +51,15 @@
 			</tr>
 			<tr>
 				<td>Circles:</td>
-				<td><select name="circle_select" id="circles" multiple>
-						<option value="All Circles">All Circles</option>
-						<option value="Family">Family</option>
-						<option value="Friends">Friends</option>
-				</select></td>
+				<td><div class="checboxes_div"></div> <input type="checkbox"
+					name="user_circles" value="All Circles">All Circles <br>
+					<input type="checkbox" name="user_circles" value="Friends">Friends
+					<br> <input type="checkbox" name="user_circles" value="Family">Family
+					</div></td>
 			</tr>
 		</table>
 		<div class="createDiv">
-			<input type="submit" class="createButton" onclick="createContact()"
+			<input type="submit" class="createButton" onclick=createContact()
 				value="Create Contact">
 		</div>
 	</div>

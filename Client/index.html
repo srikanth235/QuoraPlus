@@ -20,10 +20,13 @@
 	</div>
 	<div class="body_content">
 		<div class="menubar">
-			<input type="button" id="content" value="Add Question" onclick = "displayPostQuestion()"/> 
-			<input type="button" id="content" value="Notifications" onclick = "displayNotifications()"/> 
-			<input type="button" id="content" value="More" onclick = "displayMoreNavigation()"/>  
-			<select name="circle_select">
+			<input type="button" id="content" value="Add Question"
+				onclick="window.location.href = '/html/post_question.html';" /> <input
+				type="button" id="content" value="Notifications"
+				onclick="window.location.href = '/html/NotificationsPage.html';" />
+			<input type="button" id="content" value="More"
+				onclick="window.location.href = '/html/NavigationPage.html';" /> <select
+				name="circle_select">
 				<option value="All Circles">All Circles</option>
 				<option value="Family">Family</option>
 				<option value="Friends">Friends</option>
@@ -41,11 +44,11 @@
 				</td>
 				<div class="questions">
 					<div id="question_content">
-						<td><strong>Web Programming: What is the most
-								non-boring way to learn web programming? <br /></td>
+						<td><a href="#" id="questionpage"><strong>Web Programming: What is the most
+								non-boring way to learn web programming? </strong></a><br /></td>
 			</tr>
 			<tr>
-				<td><input type="button" id="vote_count" value="1" disabled></td>
+				<td><span class="numbers" id="votecount">0</span></td>
 				<td>Srikanth, Graduate Student</td>
 				</strong>
 			</tr>
@@ -56,10 +59,11 @@
 					be boring. I can share my 2 cents about how I tackled the
 					situation.</td>
 			</tr>
-			<tr>
+			<!-- <tr>
 				<td />
-				<td><textarea rows="2" cols="40" id="answer_textbox"></textarea></td>
-			</tr>
+				<a id="driver">Comment</a>
+    			<td><textarea rows="2" cols="40" id="text"></textarea></td>
+			</tr>-->
 			</div>
 			<tr>
 				<td colspan="9"><hr size="1" width="100%" /></td>

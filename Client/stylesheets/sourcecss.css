@@ -67,8 +67,22 @@ body {
 	width: 25px;
 	font-size: 12px;
 	background-color: white;
+	align: center;
 }
-
+#vote_count {
+	float: left;
+	height: 20px;
+	width: 25px;
+	font-size: 12px;
+	background-color: white;
+	align: center;
+}
+.numbers{
+	color: #538dc2;
+	font-weight: bold;
+	margin: 0;
+	padding: 0;
+}
 .more {
 	width: 250px;
 	margin-left: auto;

@@ -9,14 +9,7 @@
 <title>Notifications Page</title>
 <link rel="stylesheet" type="text/css" href="stylesheets/sourcecss.css">
 <script type="text/javascript" src="stylesheets/javasource.js"></script>
-<script type="text/javascript" src="stylesheets/jquery.js"></script>
 </head>
-<script>
-$.post("/view_notifications", {"email": localStorage.getItem("email")})
-.done(function(data) {
-   alert(data)
-})
-</script>
 <body>
 	<div class="titlebar" id="header-fixed">
 		<hr />
