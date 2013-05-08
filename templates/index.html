@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="keywords" content="">
+<title>Main Page</title>
+<link rel="stylesheet" type="text/css" href="/static/sourcecss.css">
+<script type="text/javascript" src="/static/jquery.js"></script>
+<script type="text/javascript" src="/static/javasource.js"></script>
+</head>
+<body>
+	<div class="titlebar" id="header-fixed">
+		<hr />
+		<input type="button" id="home"
+			onclick="window.location.href = '/';" value="Quora+">
+		<hr />
+	</div>
+	<div class="body_content">
+		<div class="menubar">
+			<input type="button" id="content" value="Add Question"
+				onclick="window.location.href = '/static/PostQuestion.html';" /> 
+			<input type="button" id="content" value="Notifications"
+				onclick="navigateToNotifications()" />
+			<input type="button" id="content" value="More"
+				onclick="window.location.href = '/static/NavigationPage.html';" />
+			<select name="circle_select">
+			    {% for circle in circles %}
+				    <option value={{circle.name}}>{{circle.name}}</option>
+			    {% endfor%}
+			</select>
+		</div>
+		<hr />
+		<table id="content_main_table">
+		{% for question in questions %}
+			<tr>
+				<td>
+					 <div id="favorite">
+						<img src="/static/favorite_blank.jpg" height=25px width=25px float=left />
+						<img src="/static/favorite_voted.jpg" height=25px width=25px float=left
+						 style="display: none" />
+					 </div>
+				</td>
+				<td>
+				     <a href="#" id="/question/{{question['id']}}"><strong>{{question['content']}} </strong></a>
+				</td>
+			</tr>
+			<tr>
+				<td><span class="numbers" id="votecount">{{question['upvotes']}}</span></td>
+				<td>{{question['author']}}</td>
+			</tr>
+			<tr>
+				<td><a id="upvote_link"><u id="u1">UpVote</u></a>
+				<td></td>
+			</tr>
+			<tr>
+				<td colspan="9"><hr size="1" width="100%" /></td>
+			</tr>
+		</table>
+</body>
+</html>
+

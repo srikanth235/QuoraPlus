@@ -52,7 +52,7 @@ def json_handler(function):
 
 #jinja cache as per http://appengine-cookbook.appspot.com/
 def jinja2_template_loader(templatename):
-    cur = os.path.join(os.path.dirname(__file__), '')
+    cur = os.path.join(os.path.dirname(__file__), 'templates/')
     templatepath = os.path.abspath(cur + templatename)
     template = memcache.get(templatepath + VERSION)
     if template is None:

@@ -1,0 +1,8 @@
+<script type="text/javascript" src="/static/stylesheets/jquery.js"></script>
+<script>
+    if(localStorage.getItem('email') == null) {
+       window.location.href = "/static/Login.html"
+    } else {
+       window.location.href = "/home?email=" + localStorage.getItem("email")
+    }
+</script>

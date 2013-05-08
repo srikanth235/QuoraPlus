@@ -38,10 +38,20 @@ class CreateUser(webapp2.RequestHandler):
                             password=self.request.get("password"),
                             first_name=self.request.get("first_name"),
                             last_name=self.request.get("last_name"))
-          if result:
-              self.response.out.write("Success")
-          else:
+
+          if not result:
               self.response.out.write("Failure")
+
+          else:
+              circle, result = Circle.create_circle(
+                        description="Universal List",
+                        email=self.request.get("email"),
+                        name="All Circles"
+                    )
+              if result:
+                  self.response.out.write("Success")
+              else:
+                  self.response.out.write("Failure")
 
 class DeleteUser(webapp2.RequestHandler):
     def post(self):
@@ -54,25 +64,31 @@ class DeleteUser(webapp2.RequestHandler):
 
 class CreateCircle(webapp2.RequestHandler):
     def post(self, user_id=None):
-        circle = Circle.create_circle(
+        circle, result = Circle.create_circle(
                         description=self.request.get("description"),
                         email=self.request.get("email"),
                         name=self.request.get("name")
                     )
-        if circle is None:
-            self.response.out.write("Failure")
-        else:
+        if result:
             self.response.out.write("Success")
+        else:
+            self.response.out.write("Failure")
 
 class CreateQuestion(webapp2.RequestHandler):
     def post(self):
-        circles = json.loads(self.request.get("circles"))
+        circles = (self.request.get("circles"))
+        circles = circles.split(",")
+        email = self.request.get("email")
+        access_list = Contact.get_members_in_circles(circles, email)
+        access_list.append(email)
+        author = User.get_user(email).screen_name
         question, result = Question.create_question(
-                    email=self.request.get("email"),
+                    email=email,
                     description=self.request.get("description"),
-                    circles=circles
+                    circles=circles,
+                    access_list=access_list,
+                    author=author
                    )
-        
         if result:
             id = question.key.id()
             self.response.out.write(question.key.id())
@@ -101,17 +117,17 @@ class CreateAnswer(webapp2.RequestHandler):
 
 class CreateContact(webapp2.RequestHandler):
     def post(self):
-        circles = json.loads(self.request.get("circles"))
+        if(User.get_user(self.request.get("email")) is None):
+            self.response.out.write("Failure")
+            return
+        circles = (self.request.get("circles"))
+        circles = circles.split(",")
         result = Contact.create_contact(
                         circles=circles,
                         email=self.request.get("email"),
                         user_email=self.request.get("user_email"),
                         name=self.request.get("name")
                     )
-        qry = Contact.query(ndb.AND(Contact.email == self.request.get("email"),
-                                     Contact.user_email == self.request.get("user_email"))).fetch()
-        if len(qry) > 0:
-            data = qry[0].circles
         result = Notification.create_notification(email=self.request.get("email"),
                                          creator_email=self.request.get("user_email"),
                                          type=1,
@@ -122,12 +138,11 @@ class CreateContact(webapp2.RequestHandler):
             self.response.out.write("Failure")
 
 class ViewContacts(webapp2.RequestHandler):
-    def post(self):
+    @template_handler('view_contacts.html')
+    def get(self):
         contacts = Contact.fetch_contacts(self.request.get("email"))
         result = []
-        for contact in contacts:
-            result.append([contact.email, contact.circles])
-        self.response.out.write(result)
+        return {'contacts': contacts}
          
 class MarkVote(webapp2.RequestHandler):
     def get(self):
@@ -167,10 +182,14 @@ class Login(webapp2.RequestHandler):
             self.response.out.write("Failure")
 
 class MainPage(webapp2.RequestHandler):
+    @template_handler('check.html')
     def get(self):
-        if self.request.get("auth") != "1":
-            self.redirect("/html/login.html")
-        self.redirect("/html/index.html")
+        return {}
+
+class HomePage(webapp2.RequestHandler):
+    @template_handler('index.html')
+    def get(self):
+        return {'circles' : Circle.fetch_circles(self.request.get("email"))}
 
 class NotificationsPage(webapp2.RequestHandler):
     def post(self):
@@ -201,7 +220,17 @@ class ClearNotificationsPage(webapp2.RequestHandler):
 class FavoritePage(webapp2.RequestHandler):
     def post(self):
         email = self.request.get("email")
-        
+
+class FetchCircles(webapp2.RequestHandler):
+    def post(self):
+        email = self.request.get("email")
+        circles = Circle.fetch_circles(email)
+        result=[]
+        for circle in circles:
+            result.append(circle.name)
+        #if "All Circles" in result:
+        #    result.remove("All Circles")
+        self.response.out.write(json.dumps(result))        
 ###### ROUTES and WSGI STUFF ######
 url_routes = []
 url_routes.append(
@@ -209,6 +238,13 @@ url_routes.append(
                          handler=MainPage,
                          strict_slash=True,
                          name="main")
+)
+
+url_routes.append(
+    routes.RedirectRoute(r'/home',
+                         handler=HomePage,
+                         strict_slash=True,
+                         name="home")
 )
 
 url_routes.append(
@@ -227,7 +263,7 @@ url_routes.append(
 )
 
 url_routes.append(
-    routes.RedirectRoute(r'/create_question',
+    routes.RedirectRoute(r'/post_question',
                          handler=CreateQuestion,
                          strict_slash=True,
                          name="create_question")
@@ -289,6 +325,14 @@ url_routes.append(
                          strict_slash=True,
                          name="view_notifications")
 )
+
+url_routes.append(
+    routes.RedirectRoute(r'/fetch_circles',
+                         handler=FetchCircles,
+                         strict_slash=True,
+                         name="fetch_circles")
+)
+
 # 
 # url_routes.append(
 #     routes.RedirectRoute(r'/<user_id:\d+>/view_contacts',

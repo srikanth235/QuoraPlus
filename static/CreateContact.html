@@ -7,9 +7,9 @@
 	content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="keywords" content="">
 <title>Create Contact</title>
-<link rel="stylesheet" type="text/css" href="stylesheets/sourcecss.css">
-<script type="text/javascript" src="stylesheets/jquery.js"></script>
-<script type="text/javascript" src="stylesheets/javasource.js"></script>
+<link rel="stylesheet" type="text/css" href="/static/sourcecss.css">
+<script type="text/javascript" src="/static/jquery.js"></script>
+<script type="text/javascript" src="/static/javasource.js"></script>
 <script>
 	var checked = {};
 	$(':input[type=checkbox]').each(function() {
@@ -36,7 +36,7 @@
 	<div class="titlebar" id="header-fixed">
 		<hr />
 		<input type="button" id="home"
-			onclick="window.location.href = '/html/index.html';" value="Quora+">
+			onclick="window.location.href = '/';" value="Quora+">
 		<hr />
 	</div>
 	<div class="body_content">
@@ -51,17 +51,30 @@
 			</tr>
 			<tr>
 				<td>Circles:</td>
-				<td><div class="checboxes_div"></div> <input type="checkbox"
-					name="user_circles" value="All Circles">All Circles <br>
-					<input type="checkbox" name="user_circles" value="Friends">Friends
-					<br> <input type="checkbox" name="user_circles" value="Family">Family
-					</div></td>
+				<td>
+				<div class="checboxes_div">
+				</div>
+				</td>
 			</tr>
 		</table>
 		<div class="createDiv">
-			<input type="submit" class="createButton" onclick=createContact()
+			<input type="submit" class="createButton" onclick="createContact()"
 				value="Create Contact">
 		</div>
 	</div>
 </body>
+<script>
+    $.post("/fetch_circles", {'email': localStorage.getItem('email')})
+    .done(function(data) {
+          var circles = JSON.parse(data);
+          for(var i = 0; i < circles.length; i++)
+              $("<input type='checkbox' name = 'user_circles' id = '" 
+                + circles[i] 
+                + "' value = '"
+                + circles[i]
+                + "'>"
+                + circles[i]
+                + "<br>").appendTo($(".checboxes_div"))
+    })
+</script>
 </html>

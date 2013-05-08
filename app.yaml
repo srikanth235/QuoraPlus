@@ -9,8 +9,8 @@ libraries:
   version: latest
 
 handlers:
-- url: /html
-  static_dir: Client
+- url: /static
+  static_dir: static
 
 - url: /.*
   script: web.app

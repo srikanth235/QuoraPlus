@@ -80,8 +80,8 @@ class Circle(ndb.Model):
                             email=email,
                             name=name)
             circle.put()
-            return True
-        return False
+            return circle, True
+        return None, False
 
     @classmethod
     def fetch_circles(cls, email):
@@ -94,14 +94,17 @@ class Question(ndb.Model):
     description = ndb.TextProperty(indexed=True)
     circles = ndb.StringProperty(repeated=True)
     email = ndb.StringProperty(indexed=True)
-    access_structure = ndb.StringProperty(indexed=True)
+    access_list= ndb.StringProperty(repeated=True, indexed=True)
+    author=ndb.StringProperty(indexed=False)
 
     @classmethod 
     @ndb.transactional(retries=1)
-    def create_question(cls, email, description, circles):
+    def create_question(cls, email, description, circles, access_list, author):
         question = Question(email=email,
                             description=description,
-                            circles=circles)
+                            circles=circles,
+                            access_list=access_list,
+                            author=author)
         question.put()
         return question, True
         
@@ -268,6 +271,16 @@ class Contact(User):
             contact.put()
             return True
         return False
+
     @classmethod
     def fetch_contacts(cls, email):
         return Contact.query(Contact.user_email == email).fetch()
+
+    @classmethod
+    def get_members_in_circles(cls, circles, email):
+        contacts = Contact.query(Contact.user_email==email).fetch()
+        result = []
+        for contact in contacts:
+            if len(list(set(contact.circles) & set(circles))) > 0:
+                result.append(contact.email)
+        return result

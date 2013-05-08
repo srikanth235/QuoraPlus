@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="keywords" content="">
+<title>Navigation Page</title>
+<link rel="stylesheet" type="text/css" href="/static/sourcecss.css">
+<script type="text/javascript" src="/static/jquery.js"></script>
+<script type="text/javascript" src="/static/javasource.js"></script>
+</head>
+<body>
+	<div class="titlebar" id="header-fixed">
+		<hr />
+		<input type="button" id="home"
+			onclick="window.location.href = '/';" value="Quora+">
+		<hr />
+	</div>
+	<div class="body_content">
+		<div class="menubar">
+			<input type="button" id="content" value="Add Question" onclick="window.location.href = '/static/PostQuestion.html';"/> <input
+				type="button" id="content" value="Notifications" onclick="navigateToNotifications()" /> <input
+				type="button" id="content" value="More" onclick="window.location.href = '/static/NavigationPage.html';"/> <select
+				name="circle_select">
+				<option value="All Circles">All Circles</option>
+				<option value="Family">Family</option>
+				<option value="Friends">Friends</option>
+			</select>
+		</div>
+		<hr />
+		<hr />
+		<div class="more" align="center">
+		    <input type="button" class="down_button" onclick="window.location.href='/static/CreateCircle.html'" value="Create Circles">
+			<input type="button" class="down_button" onclick="navigateToViewContacts()" value="Create/View Contacts">
+			<input type="button" class="down_button" onclick="window.location.href='/static/FavoriteQuestions.html'" value="Favorite Questions">
+		</div>
+	</div>
+</body>
+</html>
