@@ -18,8 +18,7 @@
 			onclick="window.location.href = '/';" value="Quora+">
 		<hr />
 	</div>
-	<div class="body_content">
-		<div class="menubar">
+	<div class="menubar">
 			<input type="button" id="content" value="Add Question"
 				onclick="window.location.href = '/static/PostQuestion.html';" /> 
 			<input type="button" id="content" value="Notifications"
@@ -31,34 +30,33 @@
 				    <option value={{circle.name}}>{{circle.name}}</option>
 			    {% endfor%}
 			</select>
-		</div>
-		<hr />
-		<table id="content_main_table">
-		{% for question in questions %}
-			<tr>
-				<td>
-					 <div id="favorite">
-						<img src="/static/favorite_blank.jpg" height=25px width=25px float=left />
-						<img src="/static/favorite_voted.jpg" height=25px width=25px float=left
-						 style="display: none" />
-					 </div>
-				</td>
-				<td>
-				     <a href="#" id="/question/{{question['id']}}"><strong>{{question['content']}} </strong></a>
-				</td>
-			</tr>
-			<tr>
-				<td><span class="numbers" id="votecount">{{question['upvotes']}}</span></td>
-				<td>{{question['author']}}</td>
-			</tr>
-			<tr>
-				<td><a id="upvote_link"><u id="u1">UpVote</u></a>
-				<td></td>
-			</tr>
-			<tr>
-				<td colspan="9"><hr size="1" width="100%" /></td>
-			</tr>
-		</table>
+	</div>
+	<hr />
+	<div id = "refresh"> Please click here to see <span id="count"> count </span> <div>
+	<table id="content_main_table">
+		{% for post in posts %}
+		<tr>
+			<td>
+				<div id="favorite">
+				    <img src="/static/favorite_blank.jpg" height=25px width=25px float=left />
+				    <img src="/static/favorite_voted.jpg" height=25px width=25px float=left style="display: none" />
+				</div>
+			</td>
+			<td>
+				<a href="#" id="/question/{{question['id']}}"><strong>{{post['question']}} </strong></a>
+			</td>
+		</tr>
+		<tr>
+			<td><span class="numbers" id="votecount">{{post['upvotes']}}</span></td>
+			<td>{{post['author']}}</td>
+		</tr>
+		<tr>
+			<td><a id="upvote_link"><u id="u1">UpVote</u></a>
+			<td>{{post['answer']}}</td>
+		</tr>
+		<tr>
+			<td colspan="9"><hr size="1" width="100%" /></td>
+		</tr>
+	</table>
 </body>
 </html>
-
