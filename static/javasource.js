@@ -50,10 +50,20 @@ function createContact() {
 	})
 }
 
-function postAnswer() {
-	description = $("#description").val();
-	$.post("/post_question",
-	          {"user_id":localstorage.getItem(email) , "description": description , "name":localstorage.getItem(name)})
+function postAnswer(question_id) {
+	description = $("#text").val();
+	question_id = 
+	$.post("/post_answer",
+	          {"email": localStorage.getItem("email"),
+	           "question_id": question_id,
+	           "description": description,
+	           "name": localStorage.getItem("name")})
+	.done(function(data){
+		window.location.reload(true)
+	 })
+	.fail(function(data) {
+		alert(data)
+	 })
 }
 
 function createQuestion() {
@@ -63,7 +73,8 @@ function createQuestion() {
 	   $.post("/post_question",{
 		        "circles": selectedCircles,
 		        "email": localStorage.getItem('email'),
-		        "description": description})
+		        "description": description,
+		        "locaiont": localStorage.getItem('location')})
 	   .done(function(data) {
 		   alert(data)
 		   window.location.href = "/"
@@ -88,7 +99,7 @@ function doLogin() {
 		}).done(function(data) {
 			  var user_data = JSON.parse(data)
               localStorage["email"] = user_data.email;
-              localStorage["screen_name"] = user_data.screen_name;
+              localStorage["name"] = user_data.screen_name;
               window.location.href = "/home?user=" + email;
 		}).fail(function(data) {
 			   alert("failure")
@@ -105,25 +116,73 @@ function navigateToNotifications() {
     	+ localStorage.getItem('email')
 }
 
-$(document).ready(function() {
-	$("#favorite").click(function() {
+function addFavoriteEventListener() {
+	$(".favorite").click(function() {
 		$(this).find('img').toggle();
-	});
-	$('#upvote_link').click( function(event) {
-	    
-		var link_content = document.getElementById("u1");
-		var vote_count =  document.getElementById("votecount");
-		var num = vote_count.innerHTML;
-		if(link_content.innerHTML === 'Undo'){
-			link_content.innerHTML='UpVote';
-			num--;
+		var question_id = $(this).attr("id")
+		$.post("/mark_favorite", {
+			'email': localStorage.getItem('email'),
+			'question_id': question_id
+		})
+	    .done(function(data) {
+			alert(data)
+	    })
+	   .fail(function(data) {
+			alert("Failure");
+	   })
+    })
+}
+
+function addVoteEventListener() {
+	$('.upvote_link').click( function(event) {
+		var answer_id = $(this).attr('id')
+		var state = 1;
+		if(this.innerHTML.indexOf('Upvoted(Undo') !== -1){
+			this.innerHTML='Upvote';
+			state = 1;
 		}
 		else{
-			link_content.innerHTML='Undo';
-			num++;
+			this.innerHTML='Upvoted(Undo)';
+			state = -1;
 		}
-		vote_count.innerHTML=num;
+		alert(answer_id)
+		$.post("/mark_vote", {
+			'email': localStorage.getItem('email'),
+			'name': localStorage.getItem('name'),
+			'answer_id': answer_id,
+			'state': state
+	    })
+	    .done(function(data) {
+	    	alert(data)
+	    })
+	    .fail(function(data) {
+	    	alert("Fail")
+	    })
 	});
-	   
-	
+}
+
+function determineGeoLocation() {
+    if (navigator.geolocation) {
+    	navigator.geolocation.getCurrentPosition(populateLocationName);
+    } else {
+    	alert("Geolocation is not supported by this browser.");
+    }
+}
+
+function populateLocationName(position) {
+	var latlng = position.coords.latitude + "," + position.coords.longitude
+	var location = "Not determined"
+    $.get("http://maps.googleapis.com/maps/api/geocode/json?latlng="+latlng+"&sensor=false")
+    .done(function(data) {
+    	var address = data["results"][0]["formatted_address"].split(",")
+    	localStorage["location"] = address[1];
+    })
+    .fail(function(data) {
+    })  
+}
+
+$(document).ready(function() {
+	addFavoriteEventListener();
+	addVoteEventListener();
+	determineGeoLocation();
 });

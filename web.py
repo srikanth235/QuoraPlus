@@ -32,6 +32,7 @@ from helpers import template_handler, json_handler
 from model import *
 
 class CreateUser(webapp2.RequestHandler):
+    @template_handler("Login.html")
     def post(self):
           user, result = User.create_user(
                             email=self.request.get("email"),
@@ -48,10 +49,7 @@ class CreateUser(webapp2.RequestHandler):
                         email=self.request.get("email"),
                         name="All Circles"
                     )
-              if result:
-                  self.response.out.write("Success")
-              else:
-                  self.response.out.write("Failure")
+              return {}
 
 class DeleteUser(webapp2.RequestHandler):
     def post(self):
@@ -81,13 +79,14 @@ class CreateQuestion(webapp2.RequestHandler):
         email = self.request.get("email")
         access_list = Contact.get_members_in_circles(circles, email)
         access_list.append(email)
-        author = User.get_user(email).screen_name
+        name = User.get_user(email).name
         question, result = Question.create_question(
                     email=email,
                     description=self.request.get("description"),
                     circles=circles,
                     access_list=access_list,
-                    author=author
+                    name=name,
+                    location=self.request.get("location")
                    )
         if result:
             id = question.key.id()
@@ -97,17 +96,18 @@ class CreateQuestion(webapp2.RequestHandler):
 
 class CreateAnswer(webapp2.RequestHandler):
     def post(self):
+        email = self.request.get("email")
         question_id = int(self.request.get("question_id"))
         answer, result = Answer.create_answer(
                         question_id=question_id,
                         email=self.request.get("email"),
                         description=self.request.get("description"),
+                        name=self.request.get("name")
                     )
         key = ndb.Key(Question, question_id)
-        email = key.get().email
         Notification.create_notification(email=email,
-                                         data=[self.request.get("email"), self.request.get("name")],
-                                         creator_email=self.request.get("email"),
+                                         data=[email, self.request.get("name")],
+                                         creator_email=email,
                                          type=2)
         if result:
             self.response.out.write(answer.key.id())
@@ -122,6 +122,7 @@ class CreateContact(webapp2.RequestHandler):
             return
         circles = (self.request.get("circles"))
         circles = circles.split(",")
+        circles.add("All Circles")
         result = Contact.create_contact(
                         circles=circles,
                         email=self.request.get("email"),
@@ -145,17 +146,16 @@ class ViewContacts(webapp2.RequestHandler):
         return {'contacts': contacts}
          
 class MarkVote(webapp2.RequestHandler):
-    def get(self):
+    def post(self):
         answer_id = int(self.request.get("answer_id"))
-        state = int(self.request.get("state"))
         vote, result = Vote.create_or_update_vote(
                         answer_id=answer_id,
                         email=self.request.get("email"),
                         name=self.request.get("name"),
-                        state=state
                     )
+        state = int(self.request.get("state"))
         if result:
-            answer, status = Answer.update_vote_count(answer_id, vote.state)
+            answer, status = Answer.update_vote_count(answer_id, state)
             self.response.out.write(answer.parent.key.id())
         else:
             self.response.out.write("Failure")
@@ -176,7 +176,7 @@ class Login(webapp2.RequestHandler):
                               self.request.get("password"))
         if result:
             self.response.out.write(
-                json.dumps({"screen_name": user.screen_name,
+                json.dumps({"name": user.name,
                             "email": user.email}))
         else:
             self.response.out.write("Failure")
@@ -189,7 +189,26 @@ class MainPage(webapp2.RequestHandler):
 class HomePage(webapp2.RequestHandler):
     @template_handler('index.html')
     def get(self):
-        return {'circles' : Circle.fetch_circles(self.request.get("email"))}
+        result = {}
+        email = self.request.get("email")
+        result['circles'] = Circle.fetch_circles(email)
+        result['favorites'] = Favorite.fetch_favorites(email)
+        result['upvoted_answers'] = Vote.fetch_voted_answers(email)
+        questions = []
+        if self.request.get("question"): 
+            result['mode'] = 1;
+            questions.append(int(self.request.get("question")))
+        else:
+            result['mode'] = 0;
+        if self.request.get("favorites"):
+            questions = result['favorites']
+        result['posts'] = []
+        all_posts = Question.fetch_questions(email, questions)
+        for question, answer in all_posts:
+            if (len(questions) == 0 or question.key.id() in questions) and email in question.access_list:
+                result['posts'].append((question, answer))
+        result['email'] = email
+        return result
 
 class NotificationsPage(webapp2.RequestHandler):
     def post(self):
@@ -270,7 +289,7 @@ url_routes.append(
 )
 
 url_routes.append(
-    routes.RedirectRoute(r'/create_answer',
+    routes.RedirectRoute(r'/post_answer',
                          handler=CreateAnswer,
                          strict_slash=True,
                          name="create_answer")
@@ -292,17 +311,10 @@ url_routes.append(
 )
  
 url_routes.append(
-    routes.RedirectRoute(r'/vote',
+    routes.RedirectRoute(r'/mark_vote',
                          handler=MarkVote,
                          strict_slash=True,
                          name="vote")
-)
- 
-url_routes.append(
-    routes.RedirectRoute(r'/favorite',
-                         handler=MarkFavorite,
-                         strict_slash=True,
-                         name="favorite")
 )
 
 url_routes.append(
@@ -333,6 +345,12 @@ url_routes.append(
                          name="fetch_circles")
 )
 
+url_routes.append(
+    routes.RedirectRoute(r'/mark_favorite',
+                         handler=MarkFavorite,
+                         strict_slash=True,
+                         name="mark_favorite")
+)
 # 
 # url_routes.append(
 #     routes.RedirectRoute(r'/<user_id:\d+>/view_contacts',

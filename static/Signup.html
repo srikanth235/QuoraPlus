@@ -10,6 +10,7 @@
 <link rel="stylesheet" type="text/css" href="/static/sourcecss.css">
 <script type="text/javascript" src="/static/jquery.js"></script>
 <script type="text/javascript" src="/static/javasource.js"></script>
+<script type="text/javascript" src="validate.min.js"></script>
 </head>
 <body>
 	<div class="titlebar" id="header-fixed">
@@ -19,6 +20,7 @@
 		<hr />
 	</div>
 	<div class="body_content">
+	<form name = "signup" method="post" action="/create_user">
 		<table class=center>
 			<tr>
 				<td>First Name:</td>
@@ -31,22 +33,43 @@
 			</tr>
 
 			<td>Email:</td>
-			<td><input type="text" id="email"></td>
+			<td><input name="email" type="text" id="email"></td>
 			</tr>
 			<tr>
 				<td>Password:</td>
-				<td><input type="password" id="password"></td>
+				<td><input name="password" type="password" id="password"></td>
 			</tr>
 			<tr>
 				<td>Retype Password:</td>
-				<td><input type="password" id="password2"></td>
+				<td><input name="password_confirm" type="password" id="password2"></td>
 			</tr>
 		</table>
 		<div class="createDiv">
-			<input type="submit" class="createButton" onclick=createUser()
+			<input type="submit" class="createButton"
 				value="Create User">
 		</div>
+		</form>
 	</div>
-	<div>
+<script>
+var validator = new FormValidator('signup', [{
+    name: 'password',
+    rules: 'required'
+}, {
+    name: 'password_confirm',
+    display: 'password confirmation',
+    rules: 'required|matches[password]'
+}, {
+    name: 'email',
+    rules: 'valid_email'
+}], function(errors, event) {
+        if(errors.length > 0) {
+            var errorString = '';
+            for (var i = 0, errorLength = errors.length; i < errorLength; i++) {
+                 errorString += errors[i].message + '<br />';
+            }
+            alert(errorString)
+        }
+});
+</script>
 </body>
 </html>

@@ -28,35 +28,67 @@
 			<select name="circle_select">
 			    {% for circle in circles %}
 				    <option value={{circle.name}}>{{circle.name}}</option>
-			    {% endfor%}
+			    {% endfor %}
 			</select>
 	</div>
 	<hr />
-	<div id = "refresh"> Please click here to see <span id="count"> count </span> <div>
+	<!--- <div id = "refresh"> Please click here to see <span id="count"> questions/answers. </span> <div> -->
 	<table id="content_main_table">
 		{% for post in posts %}
+                <!--- each post is of (question, answers) type -->
+                <div name = "author" class = {{author}}>
 		<tr>
 			<td>
-				<div id="favorite">
-				    <img src="/static/favorite_blank.jpg" height=25px width=25px float=left />
-				    <img src="/static/favorite_voted.jpg" height=25px width=25px float=left style="display: none" />
+				<div class="favorite" id={{post[0].key.id()}} >
+                    {% if post[0].key.id() in favorites %}
+				        <img src="/static/favorite_blank.jpg" } class = "not-favorite" height=15px width=15px float=left style="display: none" />
+				        <img src="/static/favorite_voted.jpg" } class = "favorite" height=15px width=15px float=left  />
+                    {% else %}
+				        <img src="/static/favorite_blank.jpg"} class = "not-favorite" height=15px width=15px float=left />
+				        <img src="/static/favorite_voted.jpg"} class = "favorite" height=15px width=15px float=left style="display: none"/>
+                    {% endif %}
 				</div>
 			</td>
 			<td>
-				<a href="#" id="/question/{{question['id']}}"><strong>{{post['question']}} </strong></a>
+				<a href="/home?question={{post[0].key.id()}}&email={{email}}"><strong>{{post[0].description}} </strong> </a> 
+				<br/>
+				Asked by {{post[0].name}} at {{post[0].location}}
 			</td>
 		</tr>
+        {% if mode == 1 %}
 		<tr>
-			<td><span class="numbers" id="votecount">{{post['upvotes']}}</span></td>
-			<td>{{post['author']}}</td>
+			<td colspan="9"><hr size="1" width="100%" /></td>
+		</tr>
+                <td />
+		        <td> <textarea rows="2" cols="40" id="text"></textarea><br>
+		        <input type="button" value="Add Answer" style="float:right" onclick="postAnswer({{post[0].key.id()}})"/></td>
+                <tr>
+			<td colspan="9"><hr size="1" width="100%" /></td>
+		</tr>
+        {% endif %}   
+        {% for answer in post[1] %}
+		<tr>
+			<td><span class="numbers" id="{{answer.key.id()}}">{{answer.upvote_count}}</span></td>
+			<td>{{answer.name}}</td>
 		</tr>
 		<tr>
-			<td><a id="upvote_link"><u id="u1">UpVote</u></a>
-			<td>{{post['answer']}}</td>
+		    <td></td>
+			<td>{{answer.description}} <br/>
+			<u><a class="upvote_link" id="{{answer.key.id()}}">
+			{% if answer.key.id() in upvoted_answers %}
+			     Upvoted(Undo)
+            {% else %}
+                 Upvote
+            {% endif %}
+            </a></u>
+            </td>
 		</tr>
 		<tr>
 			<td colspan="9"><hr size="1" width="100%" /></td>
 		</tr>
+        {% endfor %}
+        </div>
+        {% endfor %}
 	</table>
 </body>
 </html>

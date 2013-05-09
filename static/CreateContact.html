@@ -68,6 +68,7 @@
     .done(function(data) {
           var circles = JSON.parse(data);
           for(var i = 0; i < circles.length; i++)
+              if(circles[i] !== "All Circles")
               $("<input type='checkbox' name = 'user_circles' id = '" 
                 + circles[i] 
                 + "' value = '"
