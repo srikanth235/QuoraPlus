@@ -184,8 +184,8 @@ class Answer(Question):
 
     @classmethod
     @ndb.transactional(retries=1)
-    def update_vote_count(cls, answer_id, state):
-        key = ndb.Key(Answer, answer_id)
+    def update_vote_count(cls, answer_id, question_id, state):
+        key = ndb.Key(Question, question_id, Answer, answer_id)
         answer = key.get()
         if answer:
             answer.upvote_count = answer.upvote_count + state
@@ -207,9 +207,12 @@ class Vote(ndb.Model):
            vote.put()
         else:
             vote = key.get()
-            if len(vote.answer_ids) == 1:
-                vote.answer_ids.append("-1")
-            vote.answer_ids = vote.answer_ids.remove(answer_id)
+            answer_ids = vote.answer_ids
+            if answer_id in answer_ids:
+                answer_ids.remove(answer_id)
+            else:
+                answer_ids.append(answer_id)
+            vote.answer_ids = answer_ids
             vote.put()
         return vote, True
 
@@ -234,12 +237,14 @@ class Favorite(ndb.Model):
             favorite.put()
         else:
             favorite = key.get()
-            if question_id in favorite.question_ids:
-                if len(favorite.question_ids) == 1:
-                    favorite.question_ids.append(-1)
-                favorite.question_ids.remove(question_id)
+            question_ids = favorite.question_ids
+            if question_id in question_ids:
+                question_ids.remove(question_id)
+                favorite.question_ids = question_ids
             else:
-                favorite.questions_ids.append(question_id)
+                question_ids = favorite.question_ids
+                question_ids.append(question_id)
+                favorite.questions_ids = question_ids
             favorite.put()
         return favorite, True
 

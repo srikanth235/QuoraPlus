@@ -116,3 +116,9 @@ table.center {
 	margin: 50px auto;
 	padding: 20px;
 }
+
+.contact_circles {
+    background-color: green;
+    border-radius: 50%;
+    
+}

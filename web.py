@@ -24,6 +24,7 @@ from google.appengine.api import memcache
 from google.appengine.api import users
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
+from google.appengine.api import channel
 
 # from helpers import FunctionLoader, jinja2_template_loader
 # from helpers import jinja2_environment
@@ -31,8 +32,31 @@ from helpers import template_handler, json_handler
 
 from model import *
 
+client_list = []
+
+def broadcast(message, client_id=-1):
+    clients = []
+    if(client_id != -1 and client_id in client_list):
+        clients = [client_id]
+    else:
+        clients = client_list
+    for client_id in clients:
+        channel.send_message(client_id, message)
+
+class AddClient(webapp2.RequestHandler):
+    def post(self):
+        global client_list
+        client_id = self.request.get('from')
+        if client_id not in client_list:
+            client_list.append(self.request.get('from'))
+
+
+class DeleteClient(webapp2.RequestHandler):
+    def post(self):
+        global client_list
+        client_list.remove(self.request.get('from'))
+
 class CreateUser(webapp2.RequestHandler):
-    @template_handler("Login.html")
     def post(self):
           user, result = User.create_user(
                             email=self.request.get("email"),
@@ -49,7 +73,7 @@ class CreateUser(webapp2.RequestHandler):
                         email=self.request.get("email"),
                         name="All Circles"
                     )
-              return {}
+          self.redirect("/static/Login.html")
 
 class DeleteUser(webapp2.RequestHandler):
     def post(self):
@@ -78,7 +102,9 @@ class CreateQuestion(webapp2.RequestHandler):
         circles = circles.split(",")
         email = self.request.get("email")
         access_list = Contact.get_members_in_circles(circles, email)
-        access_list.append(email)
+        # adding self to the access list.
+        if email not in access_list:
+            access_list.append(email)
         name = User.get_user(email).name
         question, result = Question.create_question(
                     email=email,
@@ -91,6 +117,11 @@ class CreateQuestion(webapp2.RequestHandler):
         if result:
             id = question.key.id()
             self.response.out.write(question.key.id())
+            message = json.dumps({
+                        'type': 'post',
+                        'question_id': id
+                    })
+            broadcast(message)
         else:
             self.response.out.write("Failure")
 
@@ -122,7 +153,7 @@ class CreateContact(webapp2.RequestHandler):
             return
         circles = (self.request.get("circles"))
         circles = circles.split(",")
-        circles.add("All Circles")
+        circles.append("All Circles")
         result = Contact.create_contact(
                         circles=circles,
                         email=self.request.get("email"),
@@ -148,6 +179,7 @@ class ViewContacts(webapp2.RequestHandler):
 class MarkVote(webapp2.RequestHandler):
     def post(self):
         answer_id = int(self.request.get("answer_id"))
+        question_id = int(self.request.get("question_id"))
         vote, result = Vote.create_or_update_vote(
                         answer_id=answer_id,
                         email=self.request.get("email"),
@@ -155,8 +187,15 @@ class MarkVote(webapp2.RequestHandler):
                     )
         state = int(self.request.get("state"))
         if result:
-            answer, status = Answer.update_vote_count(answer_id, state)
-            self.response.out.write(answer.parent.key.id())
+            answer, status = Answer.update_vote_count(answer_id, question_id, state)
+            message = json.dumps({
+                        'type': 'vote',
+                        'answer_id': answer_id,
+                        'state': state,
+                        'question_id': question_id
+                    })
+            broadcast(message)            
+            self.response.out.write(question_id)
         else:
             self.response.out.write("Failure")
 
@@ -208,6 +247,8 @@ class HomePage(webapp2.RequestHandler):
             if (len(questions) == 0 or question.key.id() in questions) and email in question.access_list:
                 result['posts'].append((question, answer))
         result['email'] = email
+        channel_token = channel.create_channel(email)
+        result['channel_token'] = channel_token
         return result
 
 class NotificationsPage(webapp2.RequestHandler):
@@ -249,7 +290,14 @@ class FetchCircles(webapp2.RequestHandler):
             result.append(circle.name)
         #if "All Circles" in result:
         #    result.remove("All Circles")
-        self.response.out.write(json.dumps(result))        
+        self.response.out.write(json.dumps(result))
+        
+class CircleMembers(webapp2.RequestHandler):
+    def post(self):
+        email = self.request.get("email")
+        circle = self.request.get("circle")
+        result = Contact.get_members_in_circles([circle], email)
+        self.response.out.write(json.dumps(result))
 ###### ROUTES and WSGI STUFF ######
 url_routes = []
 url_routes.append(
@@ -351,6 +399,29 @@ url_routes.append(
                          strict_slash=True,
                          name="mark_favorite")
 )
+
+
+url_routes.append(
+    routes.RedirectRoute(r'/circle_members',
+                         handler=CircleMembers,
+                         strict_slash=True,
+                         name="circle_members")
+)
+
+url_routes.append(
+    routes.RedirectRoute(r'/_ah/channel/connected/',
+                         handler=AddClient,
+                         strict_slash=True,
+                         name="add_client")
+)
+
+url_routes.append(
+    routes.RedirectRoute(r'/_ah/channel/disconnected/',
+                         handler=DeleteClient,
+                         strict_slash=True,
+                         name="delete_client")
+)
+
 # 
 # url_routes.append(
 #     routes.RedirectRoute(r'/<user_id:\d+>/view_contacts',

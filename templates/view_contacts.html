@@ -22,9 +22,13 @@
 		<div class="view_contacts">
 		{% for contact in contacts %}
 			<strong>{{ contact.name }}
+			<span float=right class = "contact_circles">
 			{% for circle in contact.circles %}
-			    </strong> <input type="button" class="circles" value={{circle}}>
+			    {% if circle != "All Circles" %}
+			    </strong> <input type="button" opacity = "0.5" class="contact_circles" value={{circle}}>
+			    {% endif %}
 			{% endfor %}
+			</div>
 			<hr/>
 		{% endfor %}
 		</div>

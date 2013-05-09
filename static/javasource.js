@@ -74,20 +74,10 @@ function createQuestion() {
 		        "circles": selectedCircles,
 		        "email": localStorage.getItem('email'),
 		        "description": description,
-		        "locaiont": localStorage.getItem('location')})
+		        "location": localStorage.getItem('location')})
 	   .done(function(data) {
-		   alert(data)
 		   window.location.href = "/"
 	   })
-}
-
-function QuestionPage(){
-	    return false;
-}
-
-function displayPage() {
-    var questionId=123;//This Id is given by the server
-    var url = "http://"+window.location.host+"/Client"+"/"+questionId;    
 }
 
 function doLogin() {
@@ -99,8 +89,8 @@ function doLogin() {
 		}).done(function(data) {
 			  var user_data = JSON.parse(data)
               localStorage["email"] = user_data.email;
-              localStorage["name"] = user_data.screen_name;
-              window.location.href = "/home?user=" + email;
+              localStorage["name"] = user_data.name;
+              window.location.href = "/home?email=" + email;
 		}).fail(function(data) {
 			   alert("failure")
 		})
@@ -117,9 +107,10 @@ function navigateToNotifications() {
 }
 
 function addFavoriteEventListener() {
-	$(".favorite").click(function() {
+	$(".favorite").click(function(event) {
 		$(this).find('img').toggle();
 		var question_id = $(this).attr("id")
+		alert($(this).innerHTML)
 		$.post("/mark_favorite", {
 			'email': localStorage.getItem('email'),
 			'question_id': question_id
@@ -133,23 +124,34 @@ function addFavoriteEventListener() {
     })
 }
 
+function updateVoteCounter(answer_id, question_id, state) {
+	$(".vote_count")
+	
+}
+
+function shouldRefresh(question_id, answer_id) {
+
+}
+
 function addVoteEventListener() {
 	$('.upvote_link').click( function(event) {
-		var answer_id = $(this).attr('id')
+		var ids = $(this).attr('id').split(" ")
+		var question_id = ids[1]
+		var answer_id = ids[0]
 		var state = 1;
 		if(this.innerHTML.indexOf('Upvoted(Undo') !== -1){
 			this.innerHTML='Upvote';
-			state = 1;
+			state = -1;
 		}
 		else{
 			this.innerHTML='Upvoted(Undo)';
-			state = -1;
+			state = 1;
 		}
-		alert(answer_id)
 		$.post("/mark_vote", {
 			'email': localStorage.getItem('email'),
 			'name': localStorage.getItem('name'),
 			'answer_id': answer_id,
+			'question_id': question_id,
 			'state': state
 	    })
 	    .done(function(data) {
@@ -181,8 +183,43 @@ function populateLocationName(position) {
     })  
 }
 
+var post_authors
+
+function displayQuestions(authors) {
+	post_authors = authors
+	$(".author").each(function(authors){
+		var cur_author = $(this).attr("id");
+		if($.inArray(cur_author, post_authors) === 0) {
+			$(this).show()
+		}
+		else {
+			$(this).hide()
+		}
+	})
+}
+
+function addStreamChangeListener() {
+	$("#stream").change(function(data) {
+		$("#stream option:selected").each(function () {
+            var circle = $(this).text();
+            $.post("/circle_members", {
+            	      "email": localStorage.getItem("email"),
+            	      "circle": circle
+            	}
+            )
+            .done(function(data){
+            	authors = JSON.parse(data)
+            	if(circle === "All Circles")
+            		authors.push(localStorage.getItem("email"))
+            	displayQuestions(authors)
+            })
+        });
+	})
+}
+
 $(document).ready(function() {
 	addFavoriteEventListener();
+	addStreamChangeListener();
 	addVoteEventListener();
 	determineGeoLocation();
 });
