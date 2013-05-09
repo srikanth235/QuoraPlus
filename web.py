@@ -43,6 +43,11 @@ def broadcast(message, client_id=-1):
     for client_id in clients:
         channel.send_message(client_id, message)
 
+def multicast(message, users):
+    clients = list(set(client_list) & set(users))
+    for client_id in clients:
+        channel.send_message(client_id, message)
+
 class AddClient(webapp2.RequestHandler):
     def post(self):
         global client_list
@@ -118,10 +123,11 @@ class CreateQuestion(webapp2.RequestHandler):
             id = question.key.id()
             self.response.out.write(question.key.id())
             message = json.dumps({
-                        'type': 'post',
+                        'type': 'question',
                         'question_id': id
                     })
-            broadcast(message)
+            access_list.remove(email)
+            multicast(message, access_list)
         else:
             self.response.out.write("Failure")
 
@@ -142,6 +148,11 @@ class CreateAnswer(webapp2.RequestHandler):
                                          type=2)
         if result:
             self.response.out.write(answer.key.id())
+            message = json.dumps({
+                        'type': 'answer',
+                        'question_id': question_id
+                    })
+            broadcast(message)
         else:
             self.response.out.write("Success")
 
@@ -191,7 +202,7 @@ class MarkVote(webapp2.RequestHandler):
             message = json.dumps({
                         'type': 'vote',
                         'answer_id': answer_id,
-                        'state': state,
+                        'upvote_count': answer.upvote_count,
                         'question_id': question_id
                     })
             broadcast(message)            
@@ -288,8 +299,6 @@ class FetchCircles(webapp2.RequestHandler):
         result=[]
         for circle in circles:
             result.append(circle.name)
-        #if "All Circles" in result:
-        #    result.remove("All Circles")
         self.response.out.write(json.dumps(result))
         
 class CircleMembers(webapp2.RequestHandler):
@@ -298,6 +307,7 @@ class CircleMembers(webapp2.RequestHandler):
         circle = self.request.get("circle")
         result = Contact.get_members_in_circles([circle], email)
         self.response.out.write(json.dumps(result))
+
 ###### ROUTES and WSGI STUFF ######
 url_routes = []
 url_routes.append(

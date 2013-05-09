@@ -124,14 +124,26 @@ function addFavoriteEventListener() {
     })
 }
 
-function updateVoteCounter(answer_id, question_id, state) {
-	$(".vote_count")
+function updateVoteCounter(answer_id, question_id, vote_count) {
 	
+	$(".vote_count").each(function(){
+		var id = answer_id + " " + question_id
+		if($(this).attr("id") === id) {
+			$(this).html(vote_count)
+			alert(vote_count)
+		}
+	})
 }
 
-function shouldRefresh(question_id, answer_id) {
-
+function refresh() {
+	window.location.reload(true)
 }
+function refreshIfNewAnswer(question_id) {
+    var selector = "#" + question_id;
+    if($(selector).length > 0)
+    	refresh()
+}
+
 
 function addVoteEventListener() {
 	$('.upvote_link').click( function(event) {
@@ -155,7 +167,6 @@ function addVoteEventListener() {
 			'state': state
 	    })
 	    .done(function(data) {
-	    	alert(data)
 	    })
 	    .fail(function(data) {
 	    	alert("Fail")
@@ -183,11 +194,9 @@ function populateLocationName(position) {
     })  
 }
 
-var post_authors
-
 function displayQuestions(authors) {
-	post_authors = authors
-	$(".author").each(function(authors){
+	var post_authors = authors
+	$(".author").each(function(){
 		var cur_author = $(this).attr("id");
 		if($.inArray(cur_author, post_authors) === 0) {
 			$(this).show()

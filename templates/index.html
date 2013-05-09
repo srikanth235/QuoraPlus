@@ -22,11 +22,12 @@
 
   onMessage = function(m) {
       data = JSON.parse(m.data);
-      alert(data)
       if(data['type'] === 'vote')
-         updateCounter(m.anwer_id, m.state)
+         updateVoteCounter(data['answer_id'], data['question_id'], data['upvote_count'])
+      else if(data['type'] === 'question')
+         refresh()
       else
-         updateRefereshBar(m.question_id, m.answer_id)
+         refreshIfNewAnswer(data['question_id'])
   }
  
   openChannel = function() {
@@ -93,7 +94,7 @@
                 {% endif %}   
                 {% for answer in post[1] %}
 		<tr name = "author" id={{email}} class = "author">
-			<td><span class="vote_count" id="{{answer.key.id()}}">{{answer.upvote_count}}</span></td>
+			<td><span class="vote_count" id="{{answer.key.id()}} {{post[0].key.id()}}">{{answer.upvote_count}}</span></td>
 			<td>{{answer.name}}</td>
 		</tr>
 		<tr name = "author" id={{email}} class = "author">
