@@ -90,14 +90,14 @@ class DeleteUser(webapp2.RequestHandler):
               self.response.out.write("Failure")
 
 class CreateCircle(webapp2.RequestHandler):
-    def post(self, user_id=None):
+    def post(self):
         circle, result = Circle.create_circle(
                         description=self.request.get("description"),
                         email=self.request.get("email"),
                         name=self.request.get("name")
                     )
         if result:
-            self.response.out.write("Success")
+            self.response.write("Success")
         else:
             self.response.out.write("Failure")
 
@@ -121,13 +121,13 @@ class CreateQuestion(webapp2.RequestHandler):
                    )
         if result:
             id = question.key.id()
-            self.response.out.write(question.key.id())
             message = json.dumps({
                         'type': 'question',
                         'question_id': id
                     })
             access_list.remove(email)
             multicast(message, access_list)
+            self.response.out.write(question.key.id())
         else:
             self.response.out.write("Failure")
 
@@ -147,14 +147,14 @@ class CreateAnswer(webapp2.RequestHandler):
                                          creator_email=email,
                                          type=2)
         if result:
-            self.response.out.write(answer.key.id())
             message = json.dumps({
                         'type': 'answer',
                         'question_id': question_id
                     })
             broadcast(message)
+            self.response.out.write(answer.key.id())
         else:
-            self.response.out.write("Success")
+            self.response.out.write("Failure")
 
 
 class CreateContact(webapp2.RequestHandler):
@@ -171,10 +171,10 @@ class CreateContact(webapp2.RequestHandler):
                         user_email=self.request.get("user_email"),
                         name=self.request.get("name")
                     )
-        result = Notification.create_notification(email=self.request.get("email"),
-                                         creator_email=self.request.get("user_email"),
-                                         type=1,
-                                         data=circles)
+#         result = Notification.create_notification(email=self.request.get("email"),
+#                                          creator_email=self.request.get("user_email"),
+#                                          type=1,
+#                                          data=circles)
         if result:
             self.response.out.write("Success")
         else:
@@ -206,7 +206,7 @@ class MarkVote(webapp2.RequestHandler):
                         'question_id': question_id
                     })
             broadcast(message)            
-            self.response.out.write(question_id)
+            self.response.out.write(answer.upvote_count)
         else:
             self.response.out.write("Failure")
 
@@ -235,6 +235,31 @@ class MainPage(webapp2.RequestHandler):
     @template_handler('check.html')
     def get(self):
         return {}
+
+#same as home page except for disabling channels and returning JSON object directly
+class TestHomePage(webapp2.RequestHandler):
+    @template_handler('index.html')
+    def get(self):
+        result = {}
+        email = self.request.get("email")
+        result['circles'] = Circle.fetch_circles(email)
+        result['favorites'] = Favorite.fetch_favorites(email)
+        result['upvoted_answers'] = Vote.fetch_voted_answers(email)
+        questions = []
+        if self.request.get("question"): 
+            result['mode'] = 1;
+            questions.append(int(self.request.get("question")))
+        else:
+            result['mode'] = 0;
+        if self.request.get("favorites"):
+            questions = result['favorites']
+        result['posts'] = []
+        all_posts = Question.fetch_questions(email, questions)
+        for question, answer in all_posts:
+            if (len(questions) == 0 or question.key.id() in questions) and email in question.access_list:
+                result['posts'].append((question, answer))
+        result['email'] = email
+        self.response.out.write(json.dumps(result))
 
 class HomePage(webapp2.RequestHandler):
     @template_handler('index.html')
@@ -325,6 +350,13 @@ url_routes.append(
 )
 
 url_routes.append(
+    routes.RedirectRoute(r'/testhome',
+                         handler=TestHomePage,
+                         strict_slash=True,
+                         name="home")
+)
+
+url_routes.append(
     routes.RedirectRoute(r'/create_user',
                          handler=CreateUser,
                          strict_slash=True,
@@ -409,7 +441,6 @@ url_routes.append(
                          strict_slash=True,
                          name="mark_favorite")
 )
-
 
 url_routes.append(
     routes.RedirectRoute(r'/circle_members',
