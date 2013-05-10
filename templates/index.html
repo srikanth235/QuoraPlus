@@ -78,7 +78,7 @@
 			<td class = "description">
 				<a href="/home?question={{post[0].key.id()}}&email={{email}}"><strong>{{post[0].description}} </strong> </a> 
 				<br/>
-				Asked by {{post[0].name}} at {{post[0].location}}
+				<span class = "location"> Asked by {{post[0].name}} at {{post[0].location}} </location>
 			</td>
 		</tr>
                 {% if mode == 1 %}
@@ -95,7 +95,7 @@
                 {% for answer in post[1] %}
 		<tr name = "author" id={{email}} class = "author">
 			<td><span class="vote_count" id="{{answer.key.id()}} {{post[0].key.id()}}">{{answer.upvote_count}}</span></td>
-			<td>{{answer.name}}</td>
+			<td><strong>{{answer.name}}</strong></td>
 		</tr>
 		<tr name = "author" id={{email}} class = "author">
 		    <td></td>
