@@ -195,7 +195,7 @@ function displayQuestions(authors) {
 	var post_authors = authors
 	$(".author").each(function(){
 		var cur_author = $(this).attr("id");
-		if($.inArray(cur_author, post_authors) === 0) {
+		if($.inArray(cur_author, post_authors) >= 0) {
 			$(this).show()
 		}
 		else {

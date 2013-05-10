@@ -110,12 +110,14 @@
                         </a></u>
                     </td>
 		</tr>
-		<tr>
+		<tr class = "author" id={{email}}>
 			<td colspan="9"><hr size="1" width="500%" /></td>
 		</tr>
           {% endfor %}
           {% if post[1]|length == 0 %}
-                    <td colspan="9"><hr size="1" width="500%" /></td> 
+                    <tr>
+                        <td colspan="9" class = "author" id = {{email}}><hr size="1" width="500%" /></td>
+                    </tr>
           {% endif %}
           {% endfor %}
 	</table>

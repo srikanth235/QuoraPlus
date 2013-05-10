@@ -66,15 +66,7 @@ body {
 	height: 20px;
 	width: 25px;
 	font-size: 12px;
-	background-color: white;
-	align: center;
-}
-#vote_count {
-	float: left;
-	height: 20px;
-	width: 25px;
-	font-size: 12px;
-	background-color: white;
+	background-color: #f0f0f0;
 	align: center;
 }
 .numbers{
