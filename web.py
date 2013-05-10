@@ -168,14 +168,15 @@ class CreateContact(webapp2.RequestHandler):
         circles.append("All Circles")
         result = Contact.create_contact(
                         circles=circles,
-                        data='',
                         email=self.request.get("email"),
                         user_email=self.request.get("user_email"),
                         name=self.request.get("name")
                     )
+        name = User.get_user(self.request.get("user_email")).name
         result = Notification.create_notification(email=self.request.get("email"),
+                                         data='',
                                          creator_email=self.request.get("user_email"),
-                                         creator_name=self.request.get("name"),
+                                         creator_name=name,
                                          type=1)
         if result:
             self.response.out.write("Success")
