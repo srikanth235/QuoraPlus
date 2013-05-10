@@ -44,7 +44,7 @@ function createContact() {
 	}).done(function(data) {
 		if(data === "Failure")
 			alert("Contact not valid")
-		window.location.href = "/view_contacts";
+		window.location.href = "/";
 	}).fail(function() {
 		$("body").html("Try Again!");
 	})
@@ -62,7 +62,6 @@ function postAnswer(question_id) {
 		window.location.reload(true)
 	 })
 	.fail(function(data) {
-		alert(data)
 	 })
 }
 
@@ -92,7 +91,6 @@ function doLogin() {
               localStorage["name"] = user_data.name;
               window.location.href = "/home?email=" + email;
 		}).fail(function(data) {
-			   alert("failure")
 		})
 }
 
@@ -102,24 +100,25 @@ function navigateToViewContacts() {
 }
 
 function navigateToNotifications() {
-	window.location.href = "/notifications?email=" 
+	window.location.href = "/view_notifications?email=" 
     	+ localStorage.getItem('email')
 }
 
+function navigateToFavorites() {
+	window.location.href = "/home?favorites=1&email=" 
+		+ localStorage.getItem('email')
+}
 function addFavoriteEventListener() {
 	$(".favorite").click(function(event) {
 		$(this).find('img').toggle();
 		var question_id = $(this).attr("id")
-		alert($(this).innerHTML)
 		$.post("/mark_favorite", {
 			'email': localStorage.getItem('email'),
 			'question_id': question_id
 		})
 	    .done(function(data) {
-			alert(data)
 	    })
 	   .fail(function(data) {
-			alert("Failure");
 	   })
     })
 }
@@ -130,7 +129,6 @@ function updateVoteCounter(answer_id, question_id, vote_count) {
 		var id = answer_id + " " + question_id
 		if($(this).attr("id") === id) {
 			$(this).html(vote_count)
-			alert(vote_count)
 		}
 	})
 }
@@ -169,7 +167,6 @@ function addVoteEventListener() {
 	    .done(function(data) {
 	    })
 	    .fail(function(data) {
-	    	alert("Fail")
 	    })
 	});
 }

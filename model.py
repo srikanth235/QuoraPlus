@@ -114,25 +114,30 @@ class Question(ndb.Model):
     @classmethod
     def fetch_questions(cls, email, question_ids):
         qry = Question.query().order(-Question.date_created)
-        if question_ids is None:
+        if len(question_ids) == 0:
             return qry.map(single_answer_callback)
         else:
             return qry.map(multipe_answers_callback)
 
+    @classmethod
+    def get_author_email(cls, question_id):
+        key = ndb.Key(Question, question_id)
+        return key.get().email
+
 class Notification(ndb.Model):
     """Models user notification on  Quora+"""
     date_created = ndb.DateTimeProperty(indexed=True, auto_now=True)
-    data = ndb.StringProperty(indexed=False, repeated=True)
+    data = ndb.StringProperty(indexed=False)
     is_read = ndb.BooleanProperty(default=False, indexed=True)
     email = ndb.StringProperty(indexed=True)
     creator_email = ndb.StringProperty(indexed=False)
+    creator_name = ndb.StringProperty(indexed=True)
     type = ndb.IntegerProperty(indexed=True)  # 1 for addition, 2 for answering 
 
     @classmethod 
     @ndb.transactional(retries=1)
-    def create_notification(cls, email, data, creator_email, type):
-        notification = Notification(data=data, email=email,
-                                    creator_email=creator_email, type=type)
+    def create_notification(cls, email, data, creator_email, type, creator_name):
+        notification = Notification(email=email, data=data, creator_email=creator_email, type=type, creator_name=creator_name)
         notification.put()
         return True
 
@@ -148,11 +153,11 @@ class Notification(ndb.Model):
     @classmethod
     def fetch_no_of_unread_notifications(cls, email):
          return len(Notification.query(ndb.AND(Notification.email==email, Notification.is_read==False)).fetch())
-    
+
     @classmethod
-    def fetch_unread_notifications(cls, email, curs=None):
-        notifications, next_curs, more = Notification.query(ndb.AND(Notification.email==email, Notification.is_read==False)).fetch_page(20, start_cursor=curs)
-        return notifications, next_curs, more
+    def fetch_notifications(cls, email, curs=None):
+        notifications = Notification.query(Notification.email==email).fetch()
+        return notifications
 
 class Answer(Question):
     """Models answer on Quora+"""
@@ -291,5 +296,5 @@ def multipe_answers_callback(question):
     return question, answers
 
 def single_answer_callback(question):
-    answer = Answer.query(ancestor=question.key).fetch().order(-Answer.date_created).fetch(0)
-    return question, [answer]
+    answer = Answer.query(ancestor=question.key).order(-Answer.date_created).fetch(1)
+    return question, answer

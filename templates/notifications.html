@@ -20,14 +20,16 @@
 	</div>
 	<div class="body_content">
 		<div class="notifications">
-			<div class="notification_content">
-				<strong>Srikanth</strong> added you to his circles <input
-					type="button" id="Add to Circles" value="Add to Circles">
-			</div>
+		   {% for notification in notifications %}
+		    <strong>{{notification.creator_name}} </strong>
+		    {% if notification.type == 1 %}
+				  added you to his circles
+		    {% else %}
+				   answered <a href="/home?question={{notification.data}}&email={{notification.email}}">one</a> of your questions
+		    {% endif %}
 			<hr />
-			<div id="more" align="center">
-				<input type="button" class="down_button" value="More">
-			</div>
+			{% endfor %}
 		</div>
+	</div>
 </body>
 </html>

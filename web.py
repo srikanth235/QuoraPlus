@@ -141,10 +141,11 @@ class CreateAnswer(webapp2.RequestHandler):
                         description=self.request.get("description"),
                         name=self.request.get("name")
                     )
-        key = ndb.Key(Question, question_id)
-        Notification.create_notification(email=email,
-                                         data=[email, self.request.get("name")],
+        author_email = Question.get_author_email(question_id)
+        Notification.create_notification(email=author_email,
+                                         data=str(question_id),
                                          creator_email=email,
+                                         creator_name=self.request.get("name"),
                                          type=2)
         if result:
             message = json.dumps({
@@ -167,14 +168,15 @@ class CreateContact(webapp2.RequestHandler):
         circles.append("All Circles")
         result = Contact.create_contact(
                         circles=circles,
+                        data='',
                         email=self.request.get("email"),
                         user_email=self.request.get("user_email"),
                         name=self.request.get("name")
                     )
-#         result = Notification.create_notification(email=self.request.get("email"),
-#                                          creator_email=self.request.get("user_email"),
-#                                          type=1,
-#                                          data=circles)
+        result = Notification.create_notification(email=self.request.get("email"),
+                                         creator_email=self.request.get("user_email"),
+                                         creator_name=self.request.get("name"),
+                                         type=1)
         if result:
             self.response.out.write("Success")
         else:
@@ -291,7 +293,7 @@ class NotificationsPage(webapp2.RequestHandler):
     def post(self):
         email = self.request.get("email")
         curs = Cursor(urlsafe=self.request.get("cursor"))
-        notifications, next_curs, more = Notification.fetch_unread_notifications(email, curs)
+        notifications = Notification.fetch_unread_notifications(email, curs)
         result = {}
         result["notifications"] = notifications
         if next_curs is not None:
@@ -300,13 +302,12 @@ class NotificationsPage(webapp2.RequestHandler):
         self.response.out.write(json.dumps(result))
 
 class ViewNotificationsPage(webapp2.RequestHandler):
-    def post(self):
+    @template_handler('notifications.html')
+    def get(self):
         email = self.request.get("email")
-        notifications, next_curs, more = Notification.fetch_unread_notifications(email)
-        results = []
-        for notification in notifications:
-            results.append([notification.email, notification.user_email, notification.data])
-        self.response.out.write(results)
+        notifications = Notification.fetch_notifications(email)
+        result = {'notifications': notifications}
+        return result
 
 class ClearNotificationsPage(webapp2.RequestHandler):
     def post(self):
